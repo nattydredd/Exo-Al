@@ -1,0 +1,104 @@
+function renderTimeseries(dataFile) {
+
+    //Set the dimensions of the light curve box
+    var width = 1200,
+        height = 600;
+
+    //Set the scale ranges
+    var x = d3.scaleLinear().range([0, width]);
+    var y = d3.scaleLinear().range([height, 0]);
+
+    //Get the data
+    d3.csv(dataFile, function(error, data) {
+        if (error) throw error;
+
+        //Format the data
+        data.forEach(function(d) {
+            d.time = +d.time;
+            d.lum = +d.lum;
+        });
+
+        //Scale the range of the data
+        x.domain(d3.extent(data, function(d) {
+            return d.time;
+        }));
+        y.domain(d3.extent(data, function(d) {
+            return d.lum;
+        }));
+
+        //D3 Zoom
+        var zoom = d3.zoom()
+            .scaleExtent([1, 5])
+            .translateExtent([
+                [-100, -100],
+                [width + 90, height + 100]
+            ])
+            .on("zoom", zoomed);
+
+        //Timeseries canvas
+        var svg = d3.select(".lightcurveContainer").append("svg")
+            .classed("canvas", true)
+            .attr("width", width)
+            .attr("height", height)
+            .call(zoom);
+
+        //Create and append axis
+        var xAxis = d3.axisBottom(x)
+            .ticks((width + 2) / (height + 2) * 10)
+            .tickSize(height)
+            .tickPadding((height - 12) - height);
+
+        var yAxis = d3.axisRight(y)
+            .ticks(10)
+            .tickSize(width)
+            .tickPadding(4 - width);
+
+        var gX = svg.append("g")
+            .attr("class", "axis xAxis")
+            .call(xAxis);
+
+        var gY = svg.append("g")
+            .attr("class", "axis yAxis")
+            .call(yAxis);
+
+        //Axis labels
+        svg.append("text")
+            .attr("class", "axisLabel")
+            .attr("transform",
+                "translate(" + (width / 2) + " ," +
+                (height - 20) + ")")
+            .style("text-anchor", "middle")
+            .text("Time");
+
+        svg.append("text")
+            .attr("class", "axisLabel")
+            .attr("transform", "rotate(90)")
+            .attr("y", -40)
+            .attr("x", (height / 2))
+            .style("text-anchor", "middle")
+            .text("Luminosity");
+
+        //Append timeseries points
+        svg.selectAll("dot")
+            .data(data)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("r", 1)
+            .attr("cx", function(d) {
+                return x(d.time);
+            })
+            .attr("cy", function(d) {
+                return y(d.lum);
+            });
+
+        //Zoom function
+        function zoomed() {
+            svg.attr("transform", d3.event.transform);
+            gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+            gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+            svg.selectAll(".dot").attr("transform", d3.event.transform);
+        }
+
+    });
+
+} //End renderTimeseries
