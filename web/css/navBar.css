@@ -1,0 +1,51 @@
+/*Navigation Bar*/
+.navMenu {
+    background-color: #3a3a3a;
+    height: 50px;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.nd-logo {
+    height: 35px;
+    width: 35px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    float: left;
+}
+
+ul.menu {
+    padding: 0;
+    white-space: nowrap;
+}
+
+ul.menu li {
+    display: inline-block;
+}
+
+ul.menu li a {
+    text-decoration: none;
+    color: #818181;
+    padding: 0 15px;
+    border-left: 2px solid #585858;
+}
+
+.menu li:first-child>a {
+    border-left: 0;
+    padding-left: 0;
+}
+
+ul.menu li a:hover span {
+    color: #22b3eb;
+    transition: color 0.3s;
+    border-bottom: 3px solid #22b3eb;
+    transition: border-bottom 0.1s;
+}
+
+ul.menu li.active a span {
+    color: #22b3eb;
+    border-bottom: 3px solid #22b3eb;
+}

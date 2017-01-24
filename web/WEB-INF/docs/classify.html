@@ -1,0 +1,41 @@
+<div class="content">
+
+    <header class="pageHeader">
+        <h1>Classify</h1>
+    </header>
+
+    <div class="lightcurveContainer"></div>
+
+    <div class="controlBox">
+        <ul class="controls">
+            <li>
+                <button class="button"><span>Next</span></button>
+            </li>
+
+        </ul>
+    </div>
+
+    <script>
+        window.onload = function () {
+//            var currentLc = getNextLc();
+            var currentLc = "../resources/lightcurves/lightcurve1Q.csv";
+
+            renderTimeseries(currentLc);
+        };
+
+//        function getNextLc() {
+//            var xhttp = new XMLHttpRequest();
+//            var lightCurve;
+//            xhttp.
+//            xhttp.onreadystatechange = function () {
+//                if (this.readyState == 4 && this.status == 200) {
+//                    lightCurve = this.responseText;
+//                }
+//            };
+//            
+//            xhttp.open("GET", "nextLc", true);
+//            xhttp.send();
+//            console.log("Response" + lightCurve)
+//        }
+    </script>
+</div>
