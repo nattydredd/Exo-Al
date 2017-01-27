@@ -1,4 +1,4 @@
-package controller;
+package servlets;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -6,9 +6,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 //@author Nate
-@WebServlet(name = "Controller", urlPatterns = {"/docs/*"})
+@WebServlet(name = "Controller", urlPatterns = {"/Controller", "/docs/*"})
 public class Controller extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -16,6 +17,14 @@ public class Controller extends HttpServlet {
         getServletContext().log("-----------------------------------");
         getServletContext().log("Controller received a request for (full URI)" + request.getRequestURI());
 
+        HttpSession session = request.getSession();
+        getServletContext().log("Session ID " + session.getId());
+        session.setMaxInactiveInterval(30);
+        if (session.isNew()) {
+            int lcCounter = 1;
+            session.setAttribute("LcCounter", lcCounter);
+        }
+        
         //Always Forward to main.jsp
         String mainPage = "/WEB-INF/docs/main.jsp";
 
@@ -28,10 +37,14 @@ public class Controller extends HttpServlet {
         String include = null;
         switch (requestPath) {
 
-            case "/docs/home":
+            case "/Controller":
                 include = "home.html";
                 break;
 
+            case "/docs/home":
+                include = "home.html";
+                break;
+                
             case "/docs/instructions":
                 include = "instructions.html";
                 break;
@@ -44,10 +57,19 @@ public class Controller extends HttpServlet {
                 include = "results.html";
                 break;
 
+//                case "/docs/getNextLc":
+//                include = "/resources/lightcurves/lightcurve1Q.csv";
+//                 request.setAttribute("included", include);
+//                 
+//                break;
+                
+                default:
+                    include = "404page.html";
+                    break;
         }
-        getServletContext().log("Included resource" + include);
+        getServletContext().log("Included resource " + include);
         request.setAttribute("included", include);
-        
+
         request.getRequestDispatcher(mainPage).forward(request, response);
 
     }

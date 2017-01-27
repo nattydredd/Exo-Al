@@ -1,4 +1,4 @@
-function renderTimeseries(dataFile) {
+function renderTimeseries(dataFilePath) {
 
     //Set the dimensions of the light curve box
     var width = 1200,
@@ -9,7 +9,7 @@ function renderTimeseries(dataFile) {
     var y = d3.scaleLinear().range([height, 0]);
 
     //Get the data
-    d3.csv(dataFile, function(error, data) {
+    d3.csv(dataFilePath, function(error, data) {
         if (error) throw error;
 
         //Format the data
@@ -36,8 +36,9 @@ function renderTimeseries(dataFile) {
             .on("zoom", zoomed);
 
         //Timeseries canvas
-        var svg = d3.select(".lightcurveContainer").append("svg")
+        var svg = d3.select(".lcContainer").append("svg")
             .classed("canvas", true)
+            .attr("id", "canvas")
             .attr("width", width)
             .attr("height", height)
             .call(zoom);
