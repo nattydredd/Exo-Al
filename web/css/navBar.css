@@ -1,6 +1,14 @@
 /*Navigation Bar*/
+:root {
+    --mainBackgroundColor : #2a2a2a;
+    --navBarBackgroundColor : #3a3a3a;
+    --navBarMenuTextColor : #818181;
+    --navBarMenuBorderColor : #585858;
+    --navBarMenuTextHoverColor : #22b3eb;
+}
+
 .navMenu {
-    background-color: #3a3a3a;
+    background-color: var(--navBarBackgroundColor);
     height: 50px;
     width: 100%;
     position: fixed;
@@ -28,9 +36,9 @@ ul.menu li {
 
 ul.menu li a {
     text-decoration: none;
-    color: #818181;
+    color: var(--navBarMenuTextColor);
     padding: 0 15px;
-    border-left: 2px solid #585858;
+    border-left: 2px solid  var(--navBarMenuBorderColor);
 }
 
 .menu li:first-child>a {
@@ -39,13 +47,13 @@ ul.menu li a {
 }
 
 ul.menu li a:hover span {
-    color: #22b3eb;
+    color: var(--navBarMenuTextHoverColor);
     transition: color 0.3s;
-    border-bottom: 3px solid #22b3eb;
+    border-bottom: 3px solid var(--navBarMenuTextHoverColor);
     transition: border-bottom 0.1s;
 }
 
 ul.menu li.active a span {
-    color: #22b3eb;
-    border-bottom: 3px solid #22b3eb;
+    color: var(--navBarMenuTextHoverColor);
+    border-bottom: 3px solid var(--navBarMenuTextHoverColor);
 }
