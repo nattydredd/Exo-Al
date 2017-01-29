@@ -4,38 +4,38 @@
         <h1>Classify</h1>
     </header>
 
-    <div class="lightcurveContainer"></div>
+    <div class="lcContainer"></div>
 
     <div class="controlBox">
         <ul class="controls">
             <li>
-                <button class="button"><span>Next</span></button>
+                <button class="button" id="nextBtn"><span>Next</span></button>
             </li>
 
         </ul>
     </div>
 
     <script>
-        window.onload = function () {
-//            var currentLc = getNextLc();
-            var currentLc = "../resources/lightcurves/lightcurve1Q.csv";
 
-            renderTimeseries(currentLc);
+        $(document).ready(function () {
+            getNextLc();
+        });
+        $(document).on("click", "#nextBtn", function () {
+            getNextLc();
+        });
+
+        function getNextLc() {
+
+            $.get("/Exo-AL/LcManager", function (responseText) {
+                console.log(responseText);
+                if (!!document.getElementById("canvas")) {
+                    document.getElementById("canvas").remove();
+                }
+
+                renderTimeseries(responseText);
+
+            });
         };
-
-//        function getNextLc() {
-//            var xhttp = new XMLHttpRequest();
-//            var lightCurve;
-//            xhttp.
-//            xhttp.onreadystatechange = function () {
-//                if (this.readyState == 4 && this.status == 200) {
-//                    lightCurve = this.responseText;
-//                }
-//            };
-//            
-//            xhttp.open("GET", "nextLc", true);
-//            xhttp.send();
-//            console.log("Response" + lightCurve)
-//        }
+        
     </script>
 </div>
