@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <context-param>
+        <param-name>JDBC-Driver</param-name>
+        <param-value>com.mysql.jdbc.Driver</param-value>
+    </context-param>
+    <context-param>
+        <param-name>JDBC-URL</param-name>
+        <param-value>jdbc:mysql://localhost/exo-al</param-value>
+    </context-param>
+    <context-param>
+        <param-name>JDBC-UserName</param-name>
+        <param-value>root</param-value>
+    </context-param>
+    <context-param>
+        <param-name>JDBC-Password</param-name>
+        <param-value>12345</param-value>
+    </context-param>
+    <filter>
+        <filter-name>requestFIlter</filter-name>
+        <filter-class>filters.RequestFIlter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>requestFIlter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <listener>
+        <description>ServletContextListener</description>
+        <listener-class>listeners.StartupListener</listener-class>
+    </listener>
     <servlet>
         <servlet-name>Controller</servlet-name>
         <servlet-class>servlets.Controller</servlet-class>
@@ -8,18 +36,28 @@
         <servlet-name>LcManager</servlet-name>
         <servlet-class>servlets.LcManager</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ClassifyManager</servlet-name>
+        <servlet-class>servlets.ClassifyManager</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Controller</servlet-name>
         <url-pattern>/Controller</url-pattern>
+        <url-pattern>/index</url-pattern>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LcManager</servlet-name>
         <url-pattern>/LcManager</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ClassifyManager</servlet-name>
+        <url-pattern>/ClassifyManager</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
-            5
+            1
         </session-timeout>
     </session-config>
 </web-app>
