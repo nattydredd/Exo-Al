@@ -12,9 +12,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/nd-logo.bmp" />
         <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/natedStyle.css">
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/jquery-ui.min.css">
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/jquery/jquery-3.1.1.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/jquery/jquery-ui.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/d3/d3.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/timeseries.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/timeseries.js" charset="utf-8"></script>       
     </head>
 
     <body>

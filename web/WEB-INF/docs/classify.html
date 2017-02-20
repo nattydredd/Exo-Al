@@ -4,14 +4,24 @@
         <h1>Classify</h1>
     </header>
 
-    <div class="lcContainer"></div>
+    <div class="lightcurveContainer"></div>
 
     <div class="controlBox">
         <ul class="controls">
             <li>
+                <button class="button" id="backBtn"><span>Back</span></button>
+            </li>
+            <li>
+                <div class="sliderContainer">
+                    <div  id="slider"><div id="handle" class="ui-slider-handle"></div></div>
+                </div>
+            </li>
+            <li>
+                <button class="button" id="submitBtn"><span>Submit</span></button>
+            </li>
+            <li>
                 <button class="button" id="nextBtn"><span>Next</span></button>
             </li>
-
         </ul>
     </div>
 
@@ -19,11 +29,26 @@
 
         $(document).ready(function () {
             getNextLc();
+            //Slider
+            var handle = $("#handle");
+            $("#slider").slider({
+                min : -100,
+                max : 100,
+                create: function () {
+                    handle.text($(this).slider("value"));
+                },
+                slide: function (event, ui) {
+                    handle.text(ui.value);
+                }
+            });//End slider
         });
         $(document).on("click", "#nextBtn", function () {
             getNextLc();
         });
 
+//$( function() {
+//    $( "#slider" ).slider();
+//  } );
         function getNextLc() {
 
             $.get("/LcManager", function (responseText) {
@@ -35,7 +60,8 @@
                 renderTimeseries(responseText);
 
             });
-        };
-        
+        }
+        ;
+
     </script>
 </div>
