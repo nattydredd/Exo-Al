@@ -220,7 +220,7 @@ public class StarClassifier {
 
         //For each prediction
         for (PredictionSet prediction : predictions) {
-            
+
 //            //If prediction was incorrect add to the list
 //            if (prediction.getError() == true) {
 //                queryList.add(String.valueOf(prediction.getStarID()));
@@ -232,18 +232,14 @@ public class StarClassifier {
 //                    queryList.add(String.valueOf(prediction.getStarID()));
 //                }
 //            }
-            
             //If prediction confidence was low add to the list
             if (prediction.getPredictedClass() == 0 && prediction.getNonHostDistribution() < 0.7) {
-                System.out.println("pred Class " + prediction.getPredictedClass() + " " + prediction.getNonHostDistribution());
+                queryList.add(String.valueOf(prediction.getStarID()));
+            } else if (prediction.getPredictedClass() == 1 && prediction.getHostDistribution() < 0.7) {
                 queryList.add(String.valueOf(prediction.getStarID()));
             }
-            else if (prediction.getPredictedClass() == 1 && prediction.getHostDistribution() < 0.7) {
-                System.out.println("pred Class " + prediction.getPredictedClass() + " " + prediction.getHostDistribution());
-                 queryList.add(String.valueOf(prediction.getStarID()));
-            }         
         }
-        System.out.println("query List Length " + queryList.size());
+        System.out.println("Query List Length " + queryList.size());
         System.out.println("Query List " + queryList);
         System.out.println("Exiting StarClassifier - generateQueryList");
         return queryList;

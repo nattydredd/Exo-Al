@@ -2,9 +2,12 @@ package servlets;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.JDBCBean;
 import utilities.LightCurveComparator;
 import weka.core.Debug.Random;
 
@@ -19,18 +23,32 @@ import weka.core.Debug.Random;
 @WebServlet(name = "LcManager", urlPatterns = {"/LcManager"})
 public class LcManager extends HttpServlet {
 
+    //Servlet contect variable
+    private ServletContext context;
+    //JDBC connection bean
+    private JDBCBean bean;
+
     //Light curve directory path
-    public String lcPath;
+    private String lcPath;
+
+    //Global query list
+    private ArrayList<String> queryList;
+
     //Light curve list
-    public HashMap<String, ArrayList<String>> starList;
+    private HashMap<String, ArrayList<String>> starList;
     //Current star
-    public String currentStar;
+    private String currentStar;
     //Current light curve
-    public String currentLc;
+    private String currentLc;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        getServletContext().log("----------------------------------------");
         getServletContext().log("Entering LcManager processRequest...");
+
+        //Get JDBC bean
+        context = request.getServletContext();
+        bean = (JDBCBean) context.getAttribute("JDBCBean");
 
         //Get light curve directory path
         lcPath = request.getSession().getServletContext().getRealPath("/resources/lightcurves/");
@@ -65,7 +83,7 @@ public class LcManager extends HttpServlet {
         }
 
         //Display current list, star and light curve
-        getServletContext().log("Star List: " + starList);
+        getServletContext().log("Star List: " + starList.keySet());
         getServletContext().log("Current Star: " + currentStar);
         getServletContext().log("Current Light Curve: " + currentLc);
 
@@ -74,37 +92,68 @@ public class LcManager extends HttpServlet {
 
             case "getCurrentLc":
                 responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                getServletContext().log("Getting current light curve: " + currentLc);
                 break;
 
             case "getNextLc":
                 currentLc = getNextLc(starList, currentStar, currentLc);
                 session.setAttribute("CurrentLc", currentLc);
                 responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                getServletContext().log("Getting next light curve: " + currentLc);
                 break;
 
             case "getPrevLc":
                 currentLc = getPrevLc(starList, currentStar, currentLc);
                 session.setAttribute("CurrentLc", currentLc);
                 responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                getServletContext().log("Getting previous light curve: " + currentLc);
+                break;
+
+            case "submit":
+                //Record submitted value for current star
+                if (currentStar != null) {
+                    getServletContext().log("Updating queryListTable for star: " + currentStar + " with value " + request.getParameter("sliderValue"));
+                    updateQueryListTable(currentStar, request.getParameter("sliderValue"));
+                }
+
+                //Remove star from this session     
+                getServletContext().log("Removed current star: " + currentStar);
+                starList.remove(currentStar);
+                session.setAttribute("StarList", starList);
+
+                currentStar = null;
+                session.setAttribute("CurrentStar", currentStar);
+                getServletContext().log("New star list: " + starList.keySet());
+
+                //Set new current star and light curve if there are some left in the list     
+                if (starList.isEmpty()) {
+                    getServletContext().log("Sessions star list is empty!");
+                    responseText = "null";
+                    break;
+                }
+                getServletContext().log("Getting new current star and light curve");
+                currentStar = getRandomStar(starList);
+                session.setAttribute("CurrentStar", currentStar);
+
+                currentLc = starList.get(currentStar).get(0);
+                session.setAttribute("CurrentLc", currentLc);
+
+                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
                 break;
 
             default:
-
+                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
                 break;
         }
+
         //Send light curve path as response
+        getServletContext().log("Sending response " + responseText);
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(responseText);
 
-//        //Remove the light curve that was just sent     
-//        getServletContext().log("Removing light curve: " + starList.get(0));
-//        starList.remove(0);
-//        getServletContext().log("New list size: " + starList.size());
-//
-//        //Set list to session attribute
-//        session.setAttribute("LcList", starList);
         getServletContext().log("Exiting LcManager processRequest...");
+        getServletContext().log("----------------------------------------");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -153,7 +202,7 @@ public class LcManager extends HttpServlet {
         starList = createSessionLcList(lcPath);
         session.setAttribute("StarList", starList);
 
-        currentStar = getRandomFirstStar(starList);
+        currentStar = getRandomStar(starList);
         session.setAttribute("CurrentStar", currentStar);
 
         currentLc = starList.get(currentStar).get(0);
@@ -167,8 +216,15 @@ public class LcManager extends HttpServlet {
         getServletContext().log("Entering LcManager - createSessionLcList");
 
         //Get the list of stars to classify
-        ServletContext context = getServletContext();
-        ArrayList<String> queryList = (ArrayList) context.getAttribute("QueryList");
+        context = getServletContext();
+        queryList = (ArrayList) context.getAttribute("QueryList");
+
+        //Check query list is not empty
+        if (queryList.isEmpty()) {
+            getServletContext().log("Global query list is empty!");
+            getServletContext().log("Exiting LcManager - createSessionLcList");
+            return null;
+        }
 
         //List to return for session
         HashMap<String, ArrayList<String>> sessionList = new HashMap();
@@ -196,17 +252,25 @@ public class LcManager extends HttpServlet {
         return sessionList;
     }
 
-    //Gets a random first stars ID from the HashMap
-    private String getRandomFirstStar(HashMap<String, ArrayList<String>> starList) {
-        getServletContext().log("Entering LcManager - getRandomFirstStar");
+    //Gets a random stars ID from the HashMap
+    private String getRandomStar(HashMap<String, ArrayList<String>> starList) {
+        getServletContext().log("Entering LcManager - getRandomStar");
 
         //Get the keys as a list
         ArrayList keysAsArray = new ArrayList(starList.keySet());
-        Random r = new Random();
+
+        //Check the list is not empty (all stars classified)
+        if (keysAsArray.isEmpty()) {
+            getServletContext().log("Session star list is empty!");
+            getServletContext().log("Exiting LcManager - getRandomStar");
+            return null;
+        }
+
         //Select a random star id
+        Random r = new Random();
         String randomID = (String) keysAsArray.get(r.nextInt(keysAsArray.size()));
 
-        getServletContext().log("Exiting LcManager - getRandomFirstStar");
+        getServletContext().log("Exiting LcManager - getRandomStar");
         return randomID;
     }
 
@@ -240,4 +304,78 @@ public class LcManager extends HttpServlet {
         return starList.get(currentStar).get(newIndex);
     }
 
+    //Adds submitted value for current star to queryList table and updates decision count
+    //Removes current star from global query list if number of classifications >= 10
+    private void updateQueryListTable(String starID, String sliderValue) {
+        getServletContext().log("Entering LcManager - updateQueryList");
+
+        try {
+            //Convert submitted slider value to double
+            int decisionValue = Integer.valueOf(sliderValue);
+
+            //Get the current number of decisions submitted for this star
+            int decisionCount = getStarDecisionCount(starID);
+
+            //Get the total value from all decisions
+            int totalDecisionValue = getStarDecisionTotal(starID);
+
+            //If decision count maxiumum has not been reached record submitted result
+            if (decisionCount <= 9) {
+                //Update the table with the submitted decision value, new decision count and total
+                bean.executeSQLUpdate("UPDATE queryList SET "
+                        + "classVal_" + (decisionCount + 1) + "='" + decisionValue + "',"
+                        + "decisionCount='" + (decisionCount + 1) + "',"
+                        + "total='" + (decisionValue + totalDecisionValue) + "'"
+                        + " WHERE starID='" + starID + "'");
+            }
+            //If decision count is/will at maxiumum, remove the star from the global query list
+            if ((decisionCount + 1) >= 10) {
+                getServletContext().log("Removing current star from global query list");
+                //Get the query list from servlet context
+                context = getServletContext();
+                queryList = (ArrayList) context.getAttribute("QueryList");
+                //Remove current star
+                queryList.remove(currentStar);
+                context.setAttribute("QueryList", queryList);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("LcManager failed to updateQueryList exception: " + ex);
+        }
+        getServletContext().log("Exiting LcManager - updateQueryList");
+    }
+
+    //Retreive the current number of classification decisions for the give stars ID
+    private int getStarDecisionCount(String starID) {
+        getServletContext().log("Entering LcManager - getStarDecisionCount");
+
+        int result = 0;
+        ArrayList queryResult;
+        try {
+            queryResult = (ArrayList) bean.sqlQueryToArrayList("SELECT decisionCount FROM queryList WHERE starID='" + starID + "'").get(0);
+            result = (int) queryResult.get(0);
+        } catch (SQLException ex) {
+            System.err.println("LcManager failed to getStarDecisionCount exception: " + ex);
+        }
+
+        getServletContext().log("Exiting LcManager - getStarDecisionCount");
+        return result;
+    }
+
+    //Retreive the current number of classification decisions for the give stars ID
+    private int getStarDecisionTotal(String starID) {
+        getServletContext().log("Entering LcManager - getStarDecisionTotal");
+
+        int result = 0;
+        ArrayList queryResult;
+        try {
+            queryResult = (ArrayList) bean.sqlQueryToArrayList("SELECT total FROM queryList WHERE starID='" + starID + "'").get(0);
+            result = (int) queryResult.get(0);
+        } catch (SQLException ex) {
+            System.err.println("LcManager failed to getStarDecisionCount exception: " + ex);
+        }
+
+        getServletContext().log("Exiting LcManager - getStarDecisionTotal");
+        return result;
+    }
 }
