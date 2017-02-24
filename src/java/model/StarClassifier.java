@@ -2,7 +2,6 @@ package model;
 
 // @author Nate
 import java.util.ArrayList;
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.meta.FilteredClassifier;
@@ -103,7 +102,7 @@ public class StarClassifier {
             Remove removedAtt = new Remove();
             removedAtt.setAttributeIndices("1");
 
-            //Remove mean
+            //Remove mean //???????
             Remove removedAtt2 = new Remove();
             removedAtt2.setAttributeIndices("5");
 
@@ -125,12 +124,19 @@ public class StarClassifier {
         System.out.println("Exiting StarClassifier - buildClassifier");
     }
 
-    //Evaluates pre-built classifier on given instances and saves results
-    public void evaluateClassifier(Instances data) {
+    //Evaluates pre-built classifier on given instances and saves results, anonFlag anonymises the class label
+    public void evaluateClassifier(Instances data, boolean anonymiseFlag) {
         System.out.println("Entering StarClassifier - evaluateClassifier");
 
         //Set class index
         data.setClassIndex(data.numAttributes() - 1);
+
+        //Anonymise class label
+        if (anonymiseFlag) {
+            for (int i = 0; i < data.size(); i++) {
+                data.get(i).setClassMissing();
+            }
+        }
 
         try {
             //Evaluate classifier
@@ -198,36 +204,48 @@ public class StarClassifier {
         System.out.println("Exiting StarClassifier - saveResults");
     }
 
-    //Returns list of star Id's that have been incorrectly classified or with low confidence
-    public ArrayList generateClassificationList() {
-        System.out.println("Entering StarClassifier - generateClassificationList");
+    //Returns list of star Id's that have been classified with low confidence
+    public ArrayList generateQueryList() {
+        System.out.println("Entering StarClassifier - generateQueryList");
 
         //Check predictions have been made
         if (this.predictions == null) {
-            System.err.println("no predictions made yet!");
-            System.out.println("Exiting StarClassifier - generateClassificationList");
+            System.err.println("No predictions made yet!");
+            System.out.println("Exiting StarClassifier - generateQueryList");
             return null;
         }
 
         //List of star ID's
-        ArrayList<String> classificationList = new ArrayList<>();
+        ArrayList<String> queryList = new ArrayList<>();
 
         //For each prediction
         for (PredictionSet prediction : predictions) {
-            //If prediction was incorrect add to the list
-            if (prediction.getError() == true) {
-                classificationList.add(String.valueOf(prediction.getStarID()));
-            } //Else if confidence was low add to the list
-            else if (prediction.getError() == false) {
-                if (prediction.getActualClass() == 0 && prediction.getNonHostDistribution() < 0.55) {
-                    classificationList.add(String.valueOf(prediction.getStarID()));
-                } else if (prediction.getActualClass() == 1 && prediction.getHostDistribution() < 0.55) {
-                    classificationList.add(String.valueOf(prediction.getStarID()));
-                }
+            
+//            //If prediction was incorrect add to the list
+//            if (prediction.getError() == true) {
+//                queryList.add(String.valueOf(prediction.getStarID()));
+//            } //Else if confidence was low add to the list
+//            else if (prediction.getError() == false) {
+//                if (prediction.getActualClass() == 0 && prediction.getNonHostDistribution() < 0.55) {
+//                    queryList.add(String.valueOf(prediction.getStarID()));
+//                } else if (prediction.getActualClass() == 1 && prediction.getHostDistribution() < 0.55) {
+//                    queryList.add(String.valueOf(prediction.getStarID()));
+//                }
+//            }
+            
+            //If prediction confidence was low add to the list
+            if (prediction.getPredictedClass() == 0 && prediction.getNonHostDistribution() < 0.7) {
+                System.out.println("pred Class " + prediction.getPredictedClass() + " " + prediction.getNonHostDistribution());
+                queryList.add(String.valueOf(prediction.getStarID()));
             }
+            else if (prediction.getPredictedClass() == 1 && prediction.getHostDistribution() < 0.7) {
+                System.out.println("pred Class " + prediction.getPredictedClass() + " " + prediction.getHostDistribution());
+                 queryList.add(String.valueOf(prediction.getStarID()));
+            }         
         }
-
-        System.out.println("Exiting StarClassifier - generateClassificationList");
-        return classificationList;
+        System.out.println("query List Length " + queryList.size());
+        System.out.println("Query List " + queryList);
+        System.out.println("Exiting StarClassifier - generateQueryList");
+        return queryList;
     }
 }//End StarClassifier

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //@author Nate
-@WebServlet(name = "Controller", urlPatterns = {"/Controller", "/index", "/docs/*"})
+@WebServlet(name = "Controller", urlPatterns = {"/index", "/docs/*"})
 public class Controller extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -32,14 +32,10 @@ public class Controller extends HttpServlet {
         String include = null;
         switch (requestPath) {
 
-            case "/Controller":
+            case "/docs/":
                 include = "home.html";
                 break;
-
-            case "/index":
-                include = "home.html";
-                break;
-
+                
             case "/docs/home":
                 include = "home.html";
                 break;

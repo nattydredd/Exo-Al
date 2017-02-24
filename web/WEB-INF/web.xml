@@ -17,11 +17,11 @@
         <param-value>12345</param-value>
     </context-param>
     <filter>
-        <filter-name>requestFIlter</filter-name>
-        <filter-class>filters.RequestFIlter</filter-class>
+        <filter-name>requestFilter</filter-name>
+        <filter-class>filters.RequestFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>requestFIlter</filter-name>
+        <filter-name>requestFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <listener>
@@ -43,7 +43,6 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Controller</servlet-name>
-        <url-pattern>/Controller</url-pattern>
         <url-pattern>/index</url-pattern>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>

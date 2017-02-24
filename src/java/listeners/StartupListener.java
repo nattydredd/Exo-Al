@@ -51,11 +51,11 @@ public class StartupListener implements ServletContextListener {
             classifier.buildClassifier(trainingData);
             
             //Evaluate classifier on validation set
-            classifier.evaluateClassifier(validationData);
+            classifier.evaluateClassifier(validationData, true);
             
             //Get list for user classification
-            ArrayList<String> classificationList = classifier.generateClassificationList();
-            context.setAttribute("ClassificationList", classificationList);
+            ArrayList<String> queryList = classifier.generateQueryList();
+            context.setAttribute("QueryList", queryList);
             
         } catch (Exception ex) {
             System.err.println("StartupListener contextInitialized exception: " + ex);

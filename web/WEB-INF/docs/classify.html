@@ -2,6 +2,8 @@
 
     <header class="pageHeader">
         <h1>Classify</h1>
+
+        <h2>Star KIC ID: <span id="currentStar"></span> Viewing Light Curve for: <span id="currentLcQuarter"></span></h2> <h2></h2>
     </header>
 
     <div class="lightcurveContainer"></div>
@@ -28,12 +30,14 @@
     <script>
 
         $(document).ready(function () {
-            getNextLc();
+
+            getCurrentLc();
+
             //Slider
             var handle = $("#handle");
             $("#slider").slider({
-                min : -100,
-                max : 100,
+                min: -100,
+                max: 100,
                 create: function () {
                     handle.text($(this).slider("value"));
                 },
@@ -42,26 +46,58 @@
                 }
             });//End slider
         });
+
+        $(document).on("click", "#submitBtn", function () {
+            //submit();
+        });
         $(document).on("click", "#nextBtn", function () {
             getNextLc();
         });
+        $(document).on("click", "#backBtn", function () {
+            getPrevLc();
+        });
 
-//$( function() {
-//    $( "#slider" ).slider();
-//  } );
+        function getCurrentLc() {
+            $.post("/LcManager", {action: "getCurrentLc"}, function (result) {
+                console.log("Current Light Curve" + result);
+                //Update text
+                setLcText(result)
+                //Render light curve
+                renderTimeseries(result);
+            });
+        }//End getCurrentLc
+
         function getNextLc() {
 
-            $.get("/LcManager", function (responseText) {
-                console.log("getNextLc response: " + responseText);
+            $.post("/LcManager", {action: "getNextLc"}, function (result) {
+                console.log(result);
                 if (!!document.getElementById("canvas")) {
                     document.getElementById("canvas").remove();
                 }
-
-                renderTimeseries(responseText);
-
+                //Update text
+                setLcText(result)
+                //Render light curve
+                renderTimeseries(result);
             });
-        }
-        ;
+        }//End getNextLc
 
+        function getPrevLc() {
+            $.post("/LcManager", {action: "getPrevLc"}, function (result) {
+                console.log(result);
+                if (!!document.getElementById("canvas")) {
+                    document.getElementById("canvas").remove();
+                }
+                //Update text
+                setLcText(result)
+                //Render light curve
+                renderTimeseries(result);
+            });
+        }//End getPrevLc
+
+        //Change text showing which star and light curve quarter is being displayed
+        function setLcText(result) {
+            document.getElementById("currentStar").innerHTML = result.split("/")[3];
+            document.getElementById("currentLcQuarter").innerHTML = result.split("_")[1].split(".")[0];
+        }//End setLcText
     </script>
 </div>

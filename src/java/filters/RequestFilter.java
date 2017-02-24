@@ -16,13 +16,13 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Nate
  */
-public class RequestFIlter implements Filter {
+public class RequestFilter implements Filter {
 
     private static final boolean debug = true;
 
     private FilterConfig filterConfig = null;
 
-    public RequestFIlter() {
+    public RequestFilter() {
     }
 
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
@@ -49,7 +49,7 @@ public class RequestFIlter implements Filter {
             throws IOException, ServletException {
 
         if (debug) {
-            log("requestFIlter:doFilter()");
+            log("requestFilter:doFilter()");
         }
 
         doBeforeProcessing(request, response);
@@ -64,7 +64,7 @@ public class RequestFIlter implements Filter {
             if (path.startsWith("/resources") || path.startsWith("/css") || path.startsWith("/javascript") || path.startsWith("/favicon.ico")) {
                 chain.doFilter(request, response);
             } //Request for servlet
-            else if (path.startsWith("/Controller") || path.startsWith("/LcManager") || path.startsWith("/ClassifyManager")) {
+            else if (path.startsWith("/LcManager") || path.startsWith("/ClassifyManager")) {
                 chain.doFilter(request, response);
             } //Request for index page
             else if (path.startsWith("/index.html") || path.startsWith("/index")) {
@@ -126,7 +126,7 @@ public class RequestFIlter implements Filter {
         this.filterConfig = filterConfig;
         if (filterConfig != null) {
             if (debug) {
-                log("requestFIlter:Initializing filter");
+                log("requestFilter:Initializing filter");
             }
         }
     }
@@ -137,9 +137,9 @@ public class RequestFIlter implements Filter {
     @Override
     public String toString() {
         if (filterConfig == null) {
-            return ("requestFIlter()");
+            return ("requestFilter()");
         }
-        StringBuffer sb = new StringBuffer("requestFIlter(");
+        StringBuffer sb = new StringBuffer("requestFilter(");
         sb.append(filterConfig);
         sb.append(")");
         return (sb.toString());
