@@ -9,11 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //@author Nate
-@WebServlet(name = "Controller", urlPatterns = {"/Controller", "/index", "/docs/*"})
+@WebServlet(name = "Controller", urlPatterns = {"/index", "/docs/*"})
 public class Controller extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        getServletContext().log("----------------------------------------");
         getServletContext().log("Entering Controller processRequest...");
 
         //Get or create session
@@ -32,14 +33,10 @@ public class Controller extends HttpServlet {
         String include = null;
         switch (requestPath) {
 
-            case "/Controller":
+            case "/docs/":
                 include = "home.html";
                 break;
-
-            case "/index":
-                include = "home.html";
-                break;
-
+                
             case "/docs/home":
                 include = "home.html";
                 break;
@@ -65,6 +62,7 @@ public class Controller extends HttpServlet {
 
         request.getRequestDispatcher(mainPage).forward(request, response);
         getServletContext().log("Exiting Controller processRequest...");
+        getServletContext().log("----------------------------------------");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -36,7 +36,7 @@ function renderTimeseries(dataFilePath) {
             .on("zoom", zoomed);
 
         //Timeseries canvas
-        var svg = d3.select(".lcContainer").append("svg")
+        var svg = d3.select(".lightcurveContainer").append("svg")
             .classed("canvas", true)
             .attr("id", "canvas")
             .attr("width", width)

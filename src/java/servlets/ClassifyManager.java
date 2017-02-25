@@ -7,19 +7,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //@author Nate
-
 public class ClassifyManager extends HttpServlet {
-   
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-       getServletContext().log("Entering ClassifyManager processRequest...");
+            throws ServletException, IOException {
+        getServletContext().log("----------------------------------------");
+        getServletContext().log("Entering ClassifyManager processRequest...");
+
+        
+        
         
         getServletContext().log("Exiting ClassifyManager processRequest...");
-    } 
+        getServletContext().log("----------------------------------------");
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -27,12 +32,13 @@ public class ClassifyManager extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
-    } 
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -40,12 +46,13 @@ public class ClassifyManager extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override
