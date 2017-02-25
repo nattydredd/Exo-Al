@@ -26,8 +26,8 @@
 
         function getNextLc() {
 
-            $.get("/Exo-AL/LcManager", function (responseText) {
-                console.log(responseText);
+            $.get("/LcManager", function (responseText) {
+                console.log("getNextLc response: " + responseText);
                 if (!!document.getElementById("canvas")) {
                     document.getElementById("canvas").remove();
                 }

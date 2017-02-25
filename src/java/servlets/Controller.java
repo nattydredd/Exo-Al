@@ -9,29 +9,24 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //@author Nate
-@WebServlet(name = "Controller", urlPatterns = {"/Controller", "/docs/*"})
+@WebServlet(name = "Controller", urlPatterns = {"/Controller", "/index", "/docs/*"})
 public class Controller extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        getServletContext().log("-----------------------------------");
-        getServletContext().log("Controller received a request for (full URI)" + request.getRequestURI());
+        getServletContext().log("Entering Controller processRequest...");
 
+        //Get or create session
         HttpSession session = request.getSession();
         getServletContext().log("Session ID " + session.getId());
         session.setMaxInactiveInterval(30);
-        if (session.isNew()) {
-            int lcCounter = 1;
-            session.setAttribute("LcCounter", lcCounter);
-        }
-        
+
         //Always Forward to main.jsp
         String mainPage = "/WEB-INF/docs/main.jsp";
 
         //Find requested resource
         String requestPath = request.getRequestURI().substring(request.getContextPath().length());
-
-        getServletContext().log("Controller received a request for " + requestPath);
+        getServletContext().log("Controller received a request for: " + requestPath);
 
         //Resource to include defaults to error
         String include = null;
@@ -41,10 +36,14 @@ public class Controller extends HttpServlet {
                 include = "home.html";
                 break;
 
+            case "/index":
+                include = "home.html";
+                break;
+
             case "/docs/home":
                 include = "home.html";
                 break;
-                
+
             case "/docs/instructions":
                 include = "instructions.html";
                 break;
@@ -57,21 +56,15 @@ public class Controller extends HttpServlet {
                 include = "results.html";
                 break;
 
-//                case "/docs/getNextLc":
-//                include = "/resources/lightcurves/lightcurve1Q.csv";
-//                 request.setAttribute("included", include);
-//                 
-//                break;
-                
-                default:
-                    include = "404page.html";
-                    break;
+            default:
+                include = "404page.html";
+                break;
         }
-        getServletContext().log("Included resource " + include);
+        getServletContext().log("Included resource: " + include);
         request.setAttribute("included", include);
 
         request.getRequestDispatcher(mainPage).forward(request, response);
-
+        getServletContext().log("Exiting Controller processRequest...");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
