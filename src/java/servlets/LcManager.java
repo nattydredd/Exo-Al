@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,16 +21,21 @@ import weka.core.Debug.Random;
 @WebServlet(name = "LcManager", urlPatterns = {"/LcManager"})
 public class LcManager extends HttpServlet {
 
-    //Servlet contect variable
+    //Servlet context variable
     private ServletContext context;
+
     //JDBC connection bean
     private JDBCBean bean;
 
-    //Light curve directory path
+    //Light curve directory paths
     private String lcPath;
+    private String relativeLcPath;
 
     //Global query list
     private ArrayList<String> queryList;
+
+    //Session
+    HttpSession session;
 
     //Light curve list
     private HashMap<String, ArrayList<String>> starList;
@@ -46,27 +49,30 @@ public class LcManager extends HttpServlet {
         getServletContext().log("----------------------------------------");
         getServletContext().log("Entering LcManager processRequest...");
 
-        //Get JDBC bean
+        //Get servlet context
         context = request.getServletContext();
+
+        //Get JDBC bean     
         bean = (JDBCBean) context.getAttribute("JDBCBean");
 
-        //Get light curve directory path
+        //Get light curve directory paths
         lcPath = request.getSession().getServletContext().getRealPath("/resources/lightcurves/");
+        relativeLcPath = (String) context.getInitParameter("RelativeLcPath");
 
         //Determine action requested
         String action = request.getParameter("action");
         getServletContext().log("LcManager received a request to: " + action);
 
         //Get or create session
-        HttpSession session = request.getSession();
+        session = request.getSession();
         getServletContext().log("Session ID " + session.getId());
         session.setMaxInactiveInterval(30);
 
         //If session is new, generate list of light curves, get current star and current light curve
         if (session.isNew()) {
-            generateNewSessionVariables(session);
+            //If global query list is not empty
             //Set action to get current light curve (rather than next, back or submit)
-            action = "getCurrentLc";
+            action = generateNewSessionVariables(session) ? "getCurrentLc" : "queryListEmpty";
 
         } //Else get light curve list, current star and current light curve
         else {
@@ -76,73 +82,51 @@ public class LcManager extends HttpServlet {
 
             //If light curve list is null (because session was created elsewhere) get new values
             if (starList == null) {
-                generateNewSessionVariables(session);
+                //If global query list is not empty
                 //Set action to get current light curve (rather than next, back or submit)
-                action = "getCurrentLc";
+                action = generateNewSessionVariables(session) ? "getCurrentLc" : "queryListEmpty";
             }
         }
 
         //Display current list, star and light curve
-        getServletContext().log("Star List: " + starList.keySet());
-        getServletContext().log("Current Star: " + currentStar);
-        getServletContext().log("Current Light Curve: " + currentLc);
+        if (starList != null) {
+            getServletContext().log("Star List: " + starList.keySet());
+            getServletContext().log("Current Star: " + currentStar);
+            getServletContext().log("Current Light Curve: " + currentLc);
+        }
 
         String responseText = null;
+        getServletContext().log("Executing action: " + action);
         switch (action) {
 
             case "getCurrentLc":
-                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                responseText = getCurrentLc();
                 getServletContext().log("Getting current light curve: " + currentLc);
                 break;
 
             case "getNextLc":
-                currentLc = getNextLc(starList, currentStar, currentLc);
-                session.setAttribute("CurrentLc", currentLc);
-                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                responseText = getNextLc();
                 getServletContext().log("Getting next light curve: " + currentLc);
                 break;
 
             case "getPrevLc":
-                currentLc = getPrevLc(starList, currentStar, currentLc);
-                session.setAttribute("CurrentLc", currentLc);
-                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                responseText = getPrevLc();
                 getServletContext().log("Getting previous light curve: " + currentLc);
                 break;
 
             case "submit":
-                //Record submitted value for current star
-                if (currentStar != null) {
-                    getServletContext().log("Updating queryListTable for star: " + currentStar + " with value " + request.getParameter("sliderValue"));
-                    updateQueryListTable(currentStar, request.getParameter("sliderValue"));
-                }
+                responseText = submit(request.getParameter("sliderValue"));
+                getServletContext().log("Decision slider value submitted:" + request.getParameter("sliderValue"));
+                break;
 
-                //Remove star from this session     
-                getServletContext().log("Removed current star: " + currentStar);
-                starList.remove(currentStar);
-                session.setAttribute("StarList", starList);
-
-                currentStar = null;
-                session.setAttribute("CurrentStar", currentStar);
-                getServletContext().log("New star list: " + starList.keySet());
-
-                //Set new current star and light curve if there are some left in the list     
-                if (starList.isEmpty()) {
-                    getServletContext().log("Sessions star list is empty!");
-                    responseText = "null";
-                    break;
-                }
-                getServletContext().log("Getting new current star and light curve");
-                currentStar = getRandomStar(starList);
-                session.setAttribute("CurrentStar", currentStar);
-
-                currentLc = starList.get(currentStar).get(0);
-                session.setAttribute("CurrentLc", currentLc);
-
-                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+            case "queryListEmpty":
+                responseText = "null";
+                getServletContext().log("Global query list is empty setting response: null");
                 break;
 
             default:
-                responseText = "../resources/lightcurves/" + currentStar + "/" + currentLc;
+                responseText = "null";
+                getServletContext().log("Default response: null");
                 break;
         }
 
@@ -196,11 +180,19 @@ public class LcManager extends HttpServlet {
     }// </editor-fold>
 
     //Create new light curve list, current star and current light curve for this session
-    private void generateNewSessionVariables(HttpSession session) {
+    //Returns false if the global query list is empty
+    private boolean generateNewSessionVariables(HttpSession session) {
         getServletContext().log("Entering LcManager - generateNewSessionVariables");
 
         starList = createSessionLcList(lcPath);
         session.setAttribute("StarList", starList);
+
+        //Check global query list is not empty
+        if (starList == null) {
+            getServletContext().log("Global query list is empty!");
+            getServletContext().log("Exiting LcManager - generateNewSessionVariables");
+            return false;
+        }
 
         currentStar = getRandomStar(starList);
         session.setAttribute("CurrentStar", currentStar);
@@ -209,18 +201,26 @@ public class LcManager extends HttpServlet {
         session.setAttribute("CurrentLc", currentLc);
 
         getServletContext().log("Exiting LcManager - generateNewSessionVariables");
+        return true;
     }
 
     //Generates HashMap with star IDs as the key and a list of light curve quarters as the values
     private HashMap<String, ArrayList<String>> createSessionLcList(String lcPath) {
         getServletContext().log("Entering LcManager - createSessionLcList");
 
-        //Get the list of stars to classify
+        //Check global query list exists
         context = getServletContext();
+        if (!Collections.list(context.getAttributeNames()).contains("QueryList")) {
+            getServletContext().log("Global query list does not exist!");
+            getServletContext().log("Exiting LcManager - createSessionLcList");
+            return null;
+        }
+
+        //Get the list of stars to classify
         queryList = (ArrayList) context.getAttribute("QueryList");
 
-        //Check query list is not empty
-        if (queryList.isEmpty()) {
+        //Check global query list is not empty
+        if (queryList.isEmpty() || context.getAttribute("QueryList") == null) {
             getServletContext().log("Global query list is empty!");
             getServletContext().log("Exiting LcManager - createSessionLcList");
             return null;
@@ -274,24 +274,58 @@ public class LcManager extends HttpServlet {
         return randomID;
     }
 
-    //Gets the next light curve for the current star
-    private String getNextLc(HashMap<String, ArrayList<String>> starList, String currentStar, String currentLc) {
+    //Gets the light curve path for the current star
+    private String getCurrentLc() {
+        getServletContext().log("Entering LcManager - getCurrentLc");
+
+        //Check there are still stars in the list
+        if (starList.isEmpty()) {
+            getServletContext().log("Session star list is empty!");
+            getServletContext().log("Exiting LcManager - getCurrentLc");
+            return "null";
+        }
+
+        getServletContext().log("Exiting LcManager - getCurrentLc");
+        return relativeLcPath + currentStar + "/" + currentLc;
+    }
+
+    //Gets the next light curve path for the current star
+    private String getNextLc() {
         getServletContext().log("Entering LcManager - getNextLc");
+
+        //Check there are still stars in the list
+        if (starList.isEmpty()) {
+            getServletContext().log("Session star list is empty!");
+            getServletContext().log("Exiting LcManager - getNextLc");
+            return "null";
+        }
 
         //Add one to the curent light curves index
         int newIndex = starList.get(currentStar).indexOf(currentLc) + 1;
+
         //Wrap around if the end of the list is reached
         if (newIndex > starList.get(currentStar).size() - 1) {
             newIndex = 0;
         }
 
+        //Set the new light curve
+        currentLc = starList.get(currentStar).get(newIndex);
+        session.setAttribute("CurrentLc", currentLc);
+
         getServletContext().log("Exiting LcManager - getNextLc");
-        return starList.get(currentStar).get(newIndex);
+        return relativeLcPath + currentStar + "/" + currentLc;
     }
 
-    //Gets the previous light curve for the current star
-    private String getPrevLc(HashMap<String, ArrayList<String>> starList, String currentStar, String currentLc) {
+    //Gets the previous light curve path for the current star
+    private String getPrevLc() {
         getServletContext().log("Entering LcManager - getPrevLc");
+
+        //Check there are still stars in the list
+        if (starList.isEmpty()) {
+            getServletContext().log("Session star list is empty!");
+            getServletContext().log("Exiting LcManager - getNextLc");
+            return "null";
+        }
 
         //Subtract one to the curent light curves index
         int newIndex = starList.get(currentStar).indexOf(currentLc) - 1;
@@ -300,11 +334,57 @@ public class LcManager extends HttpServlet {
             newIndex = starList.get(currentStar).size() - 1;
         }
 
+        //Set the new light curve
+        currentLc = starList.get(currentStar).get(newIndex);
+        session.setAttribute("CurrentLc", currentLc);
+
         getServletContext().log("Exiting LcManager - getPrevLc");
-        return starList.get(currentStar).get(newIndex);
+        return relativeLcPath + currentStar + "/" + currentLc;
     }
 
-    //Adds submitted value for current star to queryList table and updates decision count
+    //Records submitted decision slider value for current star
+    //Removes current star from sessions list and sets a new current star and light curve
+    private String submit(String sliderValue) {
+        getServletContext().log("Entering LcManager - submit");
+
+        //Record submitted value for current star
+        if (currentStar != null) {
+            getServletContext().log("Updating queryListTable for star: " + currentStar + " with value " + sliderValue);
+            updateQueryListTable(currentStar, sliderValue);
+        }
+
+        //Remove star from this session     
+        getServletContext().log("Removed current star: " + currentStar);
+        starList.remove(currentStar);
+        session.setAttribute("StarList", starList);
+
+        currentStar = null;
+        session.setAttribute("CurrentStar", currentStar);
+
+        currentLc = null;
+        session.setAttribute("CurrentLc", currentLc);
+        getServletContext().log("New star list: " + starList.keySet());
+
+        //Set new current star and light curve if there are some left in the list     
+        if (!starList.isEmpty()) {
+            getServletContext().log("Getting new current star and light curve");
+            currentStar = getRandomStar(starList);
+            session.setAttribute("CurrentStar", currentStar);
+
+            currentLc = starList.get(currentStar).get(0);
+            session.setAttribute("CurrentLc", currentLc);
+
+        } else {
+            getServletContext().log("Sessions star list is empty!");
+            getServletContext().log("Exiting LcManager - submit");
+            return "null";
+        }
+
+        getServletContext().log("Exiting LcManager - submit");
+        return relativeLcPath + currentStar + "/" + currentLc;
+    }
+
+    //Adds submitted slider value for current star to queryList table and updates decision count
     //Removes current star from global query list if number of classifications >= 10
     private void updateQueryListTable(String starID, String sliderValue) {
         getServletContext().log("Entering LcManager - updateQueryList");
@@ -328,12 +408,18 @@ public class LcManager extends HttpServlet {
                         + "total='" + (decisionValue + totalDecisionValue) + "'"
                         + " WHERE starID='" + starID + "'");
             }
-            //If decision count is/will at maxiumum, remove the star from the global query list
+            //If decision count is/will be at maxiumum, remove the star from the global query list
             if ((decisionCount + 1) >= 10) {
                 getServletContext().log("Removing current star from global query list");
-                //Get the query list from servlet context
+                               
+                //Check global query list exists
                 context = getServletContext();
+                if (!Collections.list(context.getAttributeNames()).contains("QueryList")) {
+                    getServletContext().log("Global query list does not exist!");
+                }
+                //Get the query list from servlet context
                 queryList = (ArrayList) context.getAttribute("QueryList");
+                
                 //Remove current star
                 queryList.remove(currentStar);
                 context.setAttribute("QueryList", queryList);

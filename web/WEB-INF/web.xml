@@ -16,6 +16,10 @@
         <param-name>JDBC-Password</param-name>
         <param-value>12345</param-value>
     </context-param>
+    <context-param>
+        <param-name>RelativeLcPath</param-name>
+        <param-value>../resources/lightcurves/</param-value>
+    </context-param>
     <filter>
         <filter-name>requestFilter</filter-name>
         <filter-class>filters.RequestFilter</filter-class>

@@ -38,7 +38,7 @@
                 updateLc(responseText);
             });
 
-            //Create slider
+            //Create decision slider
             $("#slider").slider({
                 min: -100,
                 max: 100,
@@ -86,7 +86,7 @@
                 document.getElementById("canvas").remove();
             }
             //Check response contains light curve data
-            if (responseText !== "null") {
+            if (responseText !== "null" && !!responseText) {
                 //Render light curve
                 renderTimeseries(responseText);
                 //Change text showing which star and light curve quarter is being displayed

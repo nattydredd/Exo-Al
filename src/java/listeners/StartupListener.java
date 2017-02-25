@@ -18,12 +18,12 @@ import weka.core.converters.ConverterUtils.DataSource;
  * @author Nate
  */
 public class StartupListener implements ServletContextListener {
-    
+
     //Servlet contect variable
     private ServletContext context;
     //JDBC connection bean
     private JDBCBean bean;
-    
+
     @Override
     public void contextInitialized(ServletContextEvent event) {
         System.out.println("Entering StartupListener...");
@@ -45,7 +45,7 @@ public class StartupListener implements ServletContextListener {
 
         //Pass JDBC connected bean to context
         context.setAttribute("JDBCBean", bean);
-        
+
         try {
             //Retreive datasets
             Instances trainingData = getDataset(context, "resources/datasets/TrainingSet.arff");
@@ -64,15 +64,17 @@ public class StartupListener implements ServletContextListener {
             context.setAttribute("QueryList", queryList);
 
             //Generate table in database for query list
-            createQueryTable(queryList);
-            
+            createQueryTable();
+            //Populate table with stars in the query list
+            populateQueryTable(queryList);
+
         } catch (Exception ex) {
             System.err.println("StartupListener contextInitialized exception: " + ex);
         }
-        
+
         System.out.println("Exiting StartupListener...");
     }
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         //StopJDBC bean
@@ -82,27 +84,27 @@ public class StartupListener implements ServletContextListener {
     //Returns Instances list variable for provided resource string
     public Instances getDataset(ServletContext context, String resource) {
         System.out.println("Entering StartupListener - getDataset");
-        
+
         Instances returnSet = null;
         try {
             InputStream inputStream = context.getResourceAsStream(resource);
             DataSource source = new ConverterUtils.DataSource(inputStream);
             returnSet = source.getDataSet();
             inputStream.close();
-            
+
         } catch (Exception ex) {
             System.err.println("StartupListener getDataset exception: " + ex);
         }
-        
+
         System.out.println("Exiting StartupListener - getDataset");
-        
+
         return returnSet;
     }
 
     //Create new database table for stars in the query list
-    public void createQueryTable(ArrayList<String> queryList) {
+    public void createQueryTable() {
         System.out.println("Entering StartupListener - createQueryTable");
-        
+
         try {
             //Create new table
             bean.executeSQLUpdate("DROP TABLE IF EXISTS `queryList`;");
@@ -122,10 +124,22 @@ public class StartupListener implements ServletContextListener {
                     + " `total` int NOT NULL,"
                     + " PRIMARY KEY (`starID`(15))"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
-            
+
+        } catch (SQLException ex) {
+            System.err.println("StartupListener failed to create queryList table exception: " + ex);
+        }
+
+        System.out.println("Exiting StartupListener - createQueryTable");
+    }
+
+    //Populates query list table with stars in the query list
+    public void populateQueryTable(ArrayList<String> queryList) {
+        System.out.println("Entering StartupListener - populateQueryTable");
+        
+        try {
             //Create new rows for each star in query list
             for (String starID : queryList) {
-                
+
                 bean.executeSQLUpdate("INSERT INTO `queryList` (`starID`, `decisionCount`,"
                         + "`classVal_1`, `classVal_2`, `classVal_3`, `classVal_4`, `classVal_5`, "
                         + "`classVal_6`, `classVal_7`, `classVal_8`, `classVal_9`, `classVal_10`, "
@@ -134,13 +148,12 @@ public class StartupListener implements ServletContextListener {
                         + " 0, 0, 0, 0, 0,"
                         + " 0, 0, 0, 0, 0,"
                         + " 0);");
-                
+
             }
-            
         } catch (SQLException ex) {
-            System.err.println("StartupListener failed to create queryList table exception: " + ex);
+            System.err.println("StartupListener failed to populate queryList table exception: " + ex);
         }
         
-        System.out.println("Exiting StartupListener - createQueryTable");
+        System.out.println("Exiting StartupListener - populateQueryTable");
     }
 }

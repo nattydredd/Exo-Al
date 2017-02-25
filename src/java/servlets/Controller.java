@@ -14,6 +14,7 @@ public class Controller extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        getServletContext().log("----------------------------------------");
         getServletContext().log("Entering Controller processRequest...");
 
         //Get or create session
@@ -61,6 +62,7 @@ public class Controller extends HttpServlet {
 
         request.getRequestDispatcher(mainPage).forward(request, response);
         getServletContext().log("Exiting Controller processRequest...");
+        getServletContext().log("----------------------------------------");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
