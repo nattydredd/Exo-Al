@@ -3,4 +3,47 @@
     <header class="pageHeader">
         <h1>Results</h1>
     </header>
+
+    <div class="container">
+        <h2 class="sectionHeader"><span id="resultsLabel_1"></span></h2>
+        <div class="chartContainer" id="pieChartContainer"></div>
+        <div class="chartContainer" id="confusionMatrixContainer"></div>
+    </div>
+
+    <div class="container">
+        <h2 class="sectionHeader"><span id="resultsLabel_2"></span></h2>
+    </div>
+
+    <script>
+        document.getElementById("resultsLabel_1").innerHTML = "Result set: 1";
+        document.getElementById("resultsLabel_2").innerHTML = "Result set: 2";
+
+        $(document).ready(function () {
+            var obj;
+            var matrix;
+            //Get current light curve
+            $.post("/ClassifyManager", {action: "getCurrentLc"}, function (responseText) {
+                console.log("ClassifyManager response: " + responseText);
+//             matrix = JSON.parse(responseText);
+                obj = JSON.parse(responseText);
+                matrix = obj.matrix;
+                renderConfusionMatrix(matrix, labels, d3.select("#confusionMatrixContainer"));
+            });
+
+            var pieData = [{"label": "Incorrect", "value": 10}, {"label": "Correct", "value": 90}];
+            renderPieChart(pieData, d3.select("#pieChartContainer"));
+
+//         matrix = [
+//            [169, 10],
+//            [7, 46]
+//        ];
+            var labels = ["Host", "Non-host"];
+
+//        renderConfusionMatrix(matrix, labels, d3.select("#confusionMatrixContainer"));
+        });
+
+
+    </script>
 </div>
+
+

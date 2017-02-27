@@ -57,12 +57,14 @@ public class StartupListener implements ServletContextListener {
             classifier.buildClassifier(trainingData);
 
             //Evaluate classifier on validation set
-            classifier.evaluateClassifier(validationData, true);
+            boolean anonymiseFlag = false;
+            classifier.evaluateClassifier(validationData, anonymiseFlag);////TEMP USING TEST / SET NOT ANON
 
             //Get list for user classification
-            ArrayList<String> queryList = classifier.generateQueryList();
+            ArrayList<String> queryList = classifier.getResultSet().generateQueryList(0.7);
             context.setAttribute("QueryList", queryList);
-
+            context.setAttribute("ResultSet", classifier.getResultSet());
+           
             //Generate table in database for query list
             createQueryTable();
             //Populate table with stars in the query list

@@ -1,33 +1,36 @@
 <div class="content">
 
     <header class="pageHeader">
-        <h1>Classify</h1>
-
-        <h2><span id="currentStar"></span> <span id="currentLcQuarter"></span></h2>
+        <h1>Classify</h1> 
     </header>
 
-    <div class="lightcurveContainer"></div>
-
-    <div class="controlBox">
-        <ul class="controls">
-            <li>
-                <button class="button" id="backBtn"><span>Back</span></button>
-            </li>
-            <li>
-                <div class="sliderContainer">
-                    <div  id="slider"><div id="handle" class="ui-slider-handle"></div></div>
-                </div>
-            </li>
-            <li>
-                <button class="button" id="submitBtn"><span>Submit</span></button>
-            </li>
-            <li>
-                <button class="button" id="nextBtn"><span>Next</span></button>
-            </li>
-        </ul>
+    <div class="container">
+        <h2 class="sectionHeader"><span id="currentStar"></span> <span id="currentLcQuarter"></span></h2>
+        <div class="chartContainer" id="lightCurveContainer"></div>
+        
+        <div class="controlBox">
+            <ul class="controls">
+                <li>
+                    <button class="button" id="backBtn"><span>Back</span></button>
+                </li>
+                <li>
+                    <div class="sliderContainer">
+                        <div  id="slider"><div id="handle" class="ui-slider-handle"></div></div>
+                    </div>
+                </li>
+                <li>
+                    <button class="button" id="submitBtn"><span>Submit</span></button>
+                </li>
+                <li>
+                    <button class="button" id="nextBtn"><span>Next</span></button>
+                </li>
+            </ul>
+        </div>
     </div>
-
+    
     <script>
+        //Element to append light curve to
+        var targetElement = d3.select("#lightCurveContainer");
 
         //On document load get the first light curve and render the slider
         $(document).ready(function () {
@@ -88,7 +91,7 @@
             //Check response contains light curve data
             if (responseText !== "null" && !!responseText) {
                 //Render light curve
-                renderTimeseries(responseText);
+                renderTimeseries(responseText, targetElement);
                 //Change text showing which star and light curve quarter is being displayed
                 document.getElementById("currentStar").innerHTML = "Star KIC ID: " + responseText.split("/")[3];
                 document.getElementById("currentLcQuarter").innerHTML = responseText.split("_")[1].split(".")[0];

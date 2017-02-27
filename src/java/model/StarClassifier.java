@@ -7,19 +7,14 @@ import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+import weka.filters.supervised.instance.Resample;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class StarClassifier {
 
     //Classifier variables
     private FilteredClassifier classifier;
-    private double correct;
-    private double correctPercent;
-    private double incorrect;
-    private double incorrectPercent;
-    private double totalNumInstances;
-    private double[][] confusionMatrix;
-    private ArrayList<PredictionSet> predictions;
+    private ResultSet resultSet;
 
     //Constructors   
     public StarClassifier() {
@@ -34,60 +29,12 @@ public class StarClassifier {
         this.classifier = classifier;
     }
 
-    public double getCorrect() {
-        return correct;
+    public ResultSet getResultSet() {
+        return resultSet;
     }
 
-    public void setCorrect(double correct) {
-        this.correct = correct;
-    }
-
-    public double getCorrectPercent() {
-        return correctPercent;
-    }
-
-    public void setCorrectPercent(double correctPercent) {
-        this.correctPercent = correctPercent;
-    }
-
-    public double getIncorrect() {
-        return incorrect;
-    }
-
-    public void setIncorrect(double incorrect) {
-        this.incorrect = incorrect;
-    }
-
-    public double getIncorrectPercent() {
-        return incorrectPercent;
-    }
-
-    public void setIncorrectPercent(double incorrectPercent) {
-        this.incorrectPercent = incorrectPercent;
-    }
-
-    public double getTotalNumInstances() {
-        return totalNumInstances;
-    }
-
-    public void setTotalNumInstances(double totalNumInstances) {
-        this.totalNumInstances = totalNumInstances;
-    }
-
-    public double[][] getConfusionMatrix() {
-        return confusionMatrix;
-    }
-
-    public void setConfusionMatrix(double[][] confusionMatrix) {
-        this.confusionMatrix = confusionMatrix;
-    }
-
-    public ArrayList<PredictionSet> getPredictions() {
-        return predictions;
-    }
-
-    public void setPredictions(ArrayList<PredictionSet> predictions) {
-        this.predictions = predictions;
+    public void setResultSet(ResultSet resultSet) {
+        this.resultSet = resultSet;
     }
 
     //Builds a classifier on input instances
@@ -113,7 +60,7 @@ public class StarClassifier {
             //Create filtered classifier
             this.classifier = new FilteredClassifier();
             this.classifier.setFilter(removedAtt);
-//            this.classifier.setFilter(removedAtt2);
+            this.classifier.setFilter(removedAtt2);
             this.classifier.setClassifier(randForest);
             this.classifier.buildClassifier(data);
 
@@ -161,14 +108,14 @@ public class StarClassifier {
     private void saveResults(Evaluation eval, Instances data) {
         System.out.println("Entering StarClassifier - saveResults");
 
+        this.resultSet = new ResultSet();
         //Results variables
-        this.correct = eval.correct();
-        this.correctPercent = eval.pctCorrect();
-        this.incorrect = eval.incorrect();
-        this.incorrectPercent = eval.pctIncorrect();
-        this.totalNumInstances = eval.numInstances();
-        this.confusionMatrix = eval.confusionMatrix();
-        this.predictions = new ArrayList<>();
+        this.resultSet.setCorrect(eval.correct());
+        this.resultSet.setCorrectPercent(eval.pctCorrect());
+        this.resultSet.setIncorrect(eval.incorrect());
+        this.resultSet.setIncorrectPercent(eval.pctIncorrect());
+        this.resultSet.setTotalNumInstances(eval.numInstances());
+        this.resultSet.setConfusionMatrix(eval.confusionMatrix());
 
         //Get predictions from evaluation object
         ArrayList<Prediction> classifierPredictions = eval.predictions();
@@ -183,6 +130,8 @@ public class StarClassifier {
         double hostDistribution;
         boolean error;
 
+        //Get predictions for each star
+        ArrayList<PredictionSet> predictions = new ArrayList();
         for (int i = 0; i < data.size(); i++) {
             //Stars ID
             starID = Double.valueOf(data.instance(i).value(0)).intValue();
@@ -198,50 +147,13 @@ public class StarClassifier {
             hostDistribution = Double.valueOf(predTokens[5]);
             error = actualClass == predictedClass ? false : true;
 
-            this.predictions.add(new PredictionSet(starID, actualClass, predictedClass, nonHostDistribution, hostDistribution, error));
+            predictions.add(new PredictionSet(starID, actualClass, predictedClass, nonHostDistribution, hostDistribution, error));
         }
+        
+        //Add to result set
+        this.resultSet.setPredictions(predictions);
 
         System.out.println("Exiting StarClassifier - saveResults");
     }
 
-    //Returns list of star Id's that have been classified with low confidence
-    public ArrayList generateQueryList() {
-        System.out.println("Entering StarClassifier - generateQueryList");
-
-        //Check predictions have been made
-        if (this.predictions == null) {
-            System.err.println("No predictions made yet!");
-            System.out.println("Exiting StarClassifier - generateQueryList");
-            return null;
-        }
-
-        //List of star ID's
-        ArrayList<String> queryList = new ArrayList<>();
-
-        //For each prediction
-        for (PredictionSet prediction : predictions) {
-
-//            //If prediction was incorrect add to the list
-//            if (prediction.getError() == true) {
-//                queryList.add(String.valueOf(prediction.getStarID()));
-//            } //Else if confidence was low add to the list
-//            else if (prediction.getError() == false) {
-//                if (prediction.getActualClass() == 0 && prediction.getNonHostDistribution() < 0.55) {
-//                    queryList.add(String.valueOf(prediction.getStarID()));
-//                } else if (prediction.getActualClass() == 1 && prediction.getHostDistribution() < 0.55) {
-//                    queryList.add(String.valueOf(prediction.getStarID()));
-//                }
-//            }
-            //If prediction confidence was low add to the list
-            if (prediction.getPredictedClass() == 0 && prediction.getNonHostDistribution() < 0.7) {
-                queryList.add(String.valueOf(prediction.getStarID()));
-            } else if (prediction.getPredictedClass() == 1 && prediction.getHostDistribution() < 0.7) {
-                queryList.add(String.valueOf(prediction.getStarID()));
-            }
-        }
-        System.out.println("Query List Length " + queryList.size());
-        System.out.println("Query List " + queryList);
-        System.out.println("Exiting StarClassifier - generateQueryList");
-        return queryList;
-    }
 }//End StarClassifier

@@ -1,0 +1,46 @@
+/*Charts*/
+.chartContainer {
+    width: 50%;
+    /*padding: 5px;*/
+    margin: auto;
+
+    display: inline-block;
+    white-space: normal;
+    vertical-align: middle;
+    text-align:center;
+}
+
+/*Pie Chart*/
+.arc {
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.pieChartLabelOuter {
+    fill: var(--navBarMenuTextColor);
+    text-anchor: middle;
+}
+
+.pieChartLabelInner {
+    stroke-width: 0px;
+    fill: black;
+    text-anchor: middle;
+}
+
+/*Confusion Matrix*/
+.confusionMatrixBorder {
+    stroke: black;
+    stroke-width: 3px;  
+}
+
+.confusionMatrixLabels {
+   fill: var(--navBarMenuTextColor);  
+}
+
+.confusionMatrixLegend .axis text {
+    fill: var(--navBarMenuTextColor);
+    opacity: 1.0;
+}
+.confusionMatrixLegend .axis line {
+    stroke: black;
+}
