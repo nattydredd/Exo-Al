@@ -2,6 +2,9 @@ package servlets;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -233,6 +236,13 @@ public class LcManager extends HttpServlet {
         File[] listFiles;
         ArrayList<String> lcQuartersList;
         for (String starID : queryList) {
+
+            //Check light curve directory is valid
+            if (Files.notExists(Paths.get(lcPath + starID))) {
+                getServletContext().log("Light curve directory invalid!");
+                getServletContext().log("Exiting LcManager - createSessionLcList");
+                return null;
+            }
             listFiles = new File(lcPath + starID).listFiles();
             lcQuartersList = new ArrayList();
 
@@ -411,7 +421,7 @@ public class LcManager extends HttpServlet {
             //If decision count is/will be at maxiumum, remove the star from the global query list
             if ((decisionCount + 1) >= 10) {
                 getServletContext().log("Removing current star from global query list");
-                               
+
                 //Check global query list exists
                 context = getServletContext();
                 if (!Collections.list(context.getAttributeNames()).contains("QueryList")) {
@@ -419,7 +429,7 @@ public class LcManager extends HttpServlet {
                 }
                 //Get the query list from servlet context
                 queryList = (ArrayList) context.getAttribute("QueryList");
-                
+
                 //Remove current star
                 queryList.remove(currentStar);
                 context.setAttribute("QueryList", queryList);

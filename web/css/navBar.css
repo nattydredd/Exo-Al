@@ -1,12 +1,4 @@
 /*Navigation Bar*/
-:root {
-    --mainBackgroundColor : #2a2a2a;
-    --navBarBackgroundColor : #3a3a3a;
-    --navBarMenuTextColor : #818181;
-    --navBarMenuBorderColor : #585858;
-    --navBarMenuTextHoverColor : #22b3eb;
-}
-
 .navMenu {
     background-color: var(--navBarBackgroundColor);
     height: 50px;

@@ -16,7 +16,9 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/jquery/jquery-3.1.1.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/jquery/jquery-ui.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/d3/d3.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/timeseries.js" charset="utf-8"></script>       
+        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/timeseries.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/pieChart.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/confusionMatrix.js" charset="utf-8"></script>
     </head>
 
     <body>

@@ -1,22 +1,51 @@
 package servlets;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import java.io.IOException;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.JDBCBean;
+import model.ResultSet;
 
 //@author Nate
 public class ClassifyManager extends HttpServlet {
+    
+    //JSON converter
+    Gson gson = new Gson();
+
+    //Servlet context variable
+    private ServletContext context;
+
+    //JDBC connection bean
+    private JDBCBean bean;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         getServletContext().log("----------------------------------------");
         getServletContext().log("Entering ClassifyManager processRequest...");
 
+        //Get servlet context
+        context = request.getServletContext();
+
+        //Get JDBC bean     
+        bean = (JDBCBean) context.getAttribute("JDBCBean");
+
+        ResultSet resultSet = (ResultSet) context.getAttribute("ResultSet");
+
         
-        
-        
+  
+
+        String responseText = getResultSet(resultSet);
+
+        getServletContext().log("Sending response " + responseText);
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(responseText);
+
         getServletContext().log("Exiting ClassifyManager processRequest...");
         getServletContext().log("----------------------------------------");
     }
@@ -60,4 +89,18 @@ public class ClassifyManager extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private String getResultSet(ResultSet resultSet) {
+    
+    
+        JsonObject resultObj = new JsonObject();
+        resultObj.addProperty("resultSetLabel", "Initial Results");
+        resultObj.addProperty("correct", resultSet.getCorrect());
+        resultObj.addProperty("correctPercent", resultSet.getCorrectPercent());
+        resultObj.addProperty("incorrect", resultSet.getIncorrect());
+        resultObj.addProperty("incorrectPercent", resultSet.getIncorrectPercent());
+        resultObj.addProperty("totalNumInstances", resultSet.getTotalNumInstances());
+        resultObj.add("matrix", gson.toJsonTree(resultSet.getConfusionMatrix()));
+        
+        return gson.toJson(resultObj);
+    }
 }
