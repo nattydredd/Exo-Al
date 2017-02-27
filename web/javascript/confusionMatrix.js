@@ -1,4 +1,4 @@
-function renderConfusionMatrix(data, labelsData, targetElement) {
+function renderConfusionMatrix(data, targetElement) {
 
     //Set dimensions
     var margin = {top: 50, right: 50, bottom: 75, left: 100};
@@ -8,13 +8,16 @@ function renderConfusionMatrix(data, labelsData, targetElement) {
     var legendWidth = 100;
 
     //Color scale
-    //Green and red
-//    var startColor = "#aa0000";
-//    var endColor = "#00aa00";
+    //Green and grey
+    var startColor = "#3a3a3a";
+    var endColor = "#25d400";
 
     //Blue and grey
-    var startColor = "#3a3a3a";
-    var endColor = "#22b3eb";
+//    var startColor = "#3a3a3a";
+//    var endColor = "#22b3eb";
+
+    //Labels
+    var labelsData = ["Non-host", "Host"];
 
     //Validate matrix
     if (!Array.isArray(data) || !data.length || !Array.isArray(data[0])) {

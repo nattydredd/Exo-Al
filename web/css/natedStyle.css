@@ -25,6 +25,12 @@ body {
     text-decoration: none;
 }
 
+hr {
+    border-color: var(--navBarMenuBorderColor);
+    background-color: var(--navBarMenuBorderColor);
+    height: 1px;
+}
+
 /*Main content*/
 .content {
     width: 1200px;

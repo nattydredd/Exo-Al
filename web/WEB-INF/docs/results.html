@@ -6,42 +6,57 @@
 
     <div class="container">
         <h2 class="sectionHeader"><span id="resultsLabel_1"></span></h2>
-        <div class="chartContainer" id="pieChartContainer"></div>
-        <div class="chartContainer" id="confusionMatrixContainer"></div>
+        <div class="chartContainer" id="pieChartContainer_1"></div>
+        <div class="chartContainer" id="confusionMatrixContainer_1"></div>
+        <h2 class="sectionHeader">
+            Correct: <span id="correctLabel_1"></span><br>
+            Incorrect <span id="incorrectLabel_1"></span><br>
+            Total: <span id="totalNumLabel_1"></span><br>
+        </h2>
+        <hr>
     </div>
 
     <div class="container">
         <h2 class="sectionHeader"><span id="resultsLabel_2"></span></h2>
+        <div class="chartContainer" id="pieChartContainer_2"></div>
+        <div class="chartContainer" id="confusionMatrixContainer_2"></div>
+        <h2 class="sectionHeader">
+            Correct: <span id="correctLabel_2"></span><br>
+            Incorrect: <span id="incorrectLabel_2"></span><br>
+            Total: <span id="totalNumLabel_2"></span><br>
+        </h2>
     </div>
 
     <script>
-        document.getElementById("resultsLabel_1").innerHTML = "Result set: 1";
-        document.getElementById("resultsLabel_2").innerHTML = "Result set: 2";
 
         $(document).ready(function () {
-            var obj;
-            var matrix;
-            //Get current light curve
-            $.post("/ClassifyManager", {action: "getCurrentLc"}, function (responseText) {
+
+            var responseObj;
+
+            $.post("/ClassifyManager", {action: ""}, function (responseText) {
                 console.log("ClassifyManager response: " + responseText);
-//             matrix = JSON.parse(responseText);
-                obj = JSON.parse(responseText);
-                matrix = obj.matrix;
-                renderConfusionMatrix(matrix, labels, d3.select("#confusionMatrixContainer"));
+                responseObj = JSON.parse(responseText);
+                displayResults(responseObj, 1);
             });
-
-            var pieData = [{"label": "Incorrect", "value": 10}, {"label": "Correct", "value": 90}];
-            renderPieChart(pieData, d3.select("#pieChartContainer"));
-
-//         matrix = [
-//            [169, 10],
-//            [7, 46]
-//        ];
-            var labels = ["Host", "Non-host"];
-
-//        renderConfusionMatrix(matrix, labels, d3.select("#confusionMatrixContainer"));
         });
 
+        function displayResults(responseObj, id) {
+            //Title
+            document.getElementById("resultsLabel_" + id).innerHTML = responseObj.resultSetLabel;
+
+            //Pie chart
+            var pieData = [{"label": "Correct", "value": responseObj.correctPercent},
+                {"label": "Inorrect", "value": responseObj.incorrectPercent}];
+            renderPieChart(pieData, d3.select("#pieChartContainer_" + id));
+
+            //Confusion matrix
+            renderConfusionMatrix(responseObj.matrix, d3.select("#confusionMatrixContainer_" + id));
+
+            //Number correct/incorrect and total
+            document.getElementById("correctLabel_" + id).innerHTML = responseObj.correct;
+            document.getElementById("incorrectLabel_" + id).innerHTML = responseObj.incorrect;
+            document.getElementById("totalNumLabel_" + id).innerHTML = responseObj.totalNumInstances;
+        }
 
     </script>
 </div>

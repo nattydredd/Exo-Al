@@ -77,7 +77,7 @@ function renderPieChart(data, targetElement) {
             })
             .attr("dy", ".35em")
             .text(function (d) {
-                return d.data.value;
+                return d.data.value + "%";
             });
 
 }//End renderPieChart

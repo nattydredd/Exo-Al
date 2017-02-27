@@ -13,8 +13,8 @@ import model.ResultSet;
 
 //@author Nate
 public class ClassifyManager extends HttpServlet {
+    
     //JSON converter
-
     Gson gson = new Gson();
 
     //Servlet context variable
@@ -36,18 +36,10 @@ public class ClassifyManager extends HttpServlet {
 
         ResultSet resultSet = (ResultSet) context.getAttribute("ResultSet");
 
-        JsonObject resultObj = new JsonObject();
         
-        resultObj.addProperty("correct", resultSet.getCorrect());
-        resultObj.addProperty("correctPercent", resultSet.getCorrectPercent());
-        resultObj.addProperty("incorrect", resultSet.getIncorrect());
-        resultObj.addProperty("incorrectPercent", resultSet.getIncorrectPercent());
-        resultObj.addProperty("totalNumInstances", resultSet.getTotalNumInstances());
-        resultObj.add("matrix", gson.toJsonTree(resultSet.getConfusionMatrix()));
   
-//        String results = gson.toJson(resultSet.getConfusionMatrix());
-                String results = gson.toJson(resultObj);
-        String responseText = results;
+
+        String responseText = getResultSet(resultSet);
 
         getServletContext().log("Sending response " + responseText);
         response.setContentType("text/plain");
@@ -97,4 +89,18 @@ public class ClassifyManager extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private String getResultSet(ResultSet resultSet) {
+    
+    
+        JsonObject resultObj = new JsonObject();
+        resultObj.addProperty("resultSetLabel", "Initial Results");
+        resultObj.addProperty("correct", resultSet.getCorrect());
+        resultObj.addProperty("correctPercent", resultSet.getCorrectPercent());
+        resultObj.addProperty("incorrect", resultSet.getIncorrect());
+        resultObj.addProperty("incorrectPercent", resultSet.getIncorrectPercent());
+        resultObj.addProperty("totalNumInstances", resultSet.getTotalNumInstances());
+        resultObj.add("matrix", gson.toJsonTree(resultSet.getConfusionMatrix()));
+        
+        return gson.toJson(resultObj);
+    }
 }
