@@ -48,27 +48,20 @@ public class StartupListener implements ServletContextListener {
 
         try {
             //Retreive datasets
-            Instances trainingData = getDataset(context, "resources/datasets/TrainingSet.arff");
-            Instances validationData = getDataset(context, "resources/datasets/ValidationSetTEST.arff");
-            Instances testData = getDataset(context, "resources/datasets/TestSet.arff");
+            Instances trainingSet = getDataset(context, "resources/datasets/TrainingSet.arff");
+            Instances validationSet = getDataset(context, "resources/datasets/ValidationSetTEST.arff");
+            Instances testSet = getDataset(context, "resources/datasets/TestSet.arff");
 
-            //Build and train classifier
-            StarClassifier classifier = new StarClassifier();
-            classifier.buildClassifier(trainingData);
+            //Pass datasets to context
+            context.setAttribute("TrainingSet", trainingSet);
+            context.setAttribute("ValidationSet", validationSet);
+            context.setAttribute("TestSet", testSet);   
+            
+            //Set initial results flag to false
+            context.setAttribute("InitialResultsFlag", false);
 
-            //Evaluate classifier on validation set
-            boolean anonymiseFlag = false;
-            classifier.evaluateClassifier(validationData, anonymiseFlag);////TEMP USING  / SET NOT ANON
-
-            //Get list for user classification
-            ArrayList<String> queryList = classifier.getResultSet().generateQueryList(0.7);
-            context.setAttribute("QueryList", queryList);
-            context.setAttribute("ResultSet", classifier.getResultSet());
-           
             //Generate table in database for query list
             createQueryTable();
-            //Populate table with stars in the query list
-            populateQueryTable(queryList);
 
         } catch (Exception ex) {
             System.err.println("StartupListener contextInitialized exception: " + ex);
@@ -118,11 +111,6 @@ public class StartupListener implements ServletContextListener {
                     + " `classVal_3` int NOT NULL,"
                     + " `classVal_4` int NOT NULL,"
                     + " `classVal_5` int NOT NULL,"
-                    + " `classVal_6` int NOT NULL,"
-                    + " `classVal_7` int NOT NULL,"
-                    + " `classVal_8` int NOT NULL,"
-                    + " `classVal_9` int NOT NULL,"
-                    + " `classVal_10` int NOT NULL,"
                     + " `total` int NOT NULL,"
                     + " PRIMARY KEY (`starID`(15))"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
@@ -132,30 +120,5 @@ public class StartupListener implements ServletContextListener {
         }
 
         System.out.println("Exiting StartupListener - createQueryTable");
-    }
-
-    //Populates query list table with stars in the query list
-    public void populateQueryTable(ArrayList<String> queryList) {
-        System.out.println("Entering StartupListener - populateQueryTable");
-        
-        try {
-            //Create new rows for each star in query list
-            for (String starID : queryList) {
-
-                bean.executeSQLUpdate("INSERT INTO `queryList` (`starID`, `decisionCount`,"
-                        + "`classVal_1`, `classVal_2`, `classVal_3`, `classVal_4`, `classVal_5`, "
-                        + "`classVal_6`, `classVal_7`, `classVal_8`, `classVal_9`, `classVal_10`, "
-                        + "`total`)"
-                        + "VALUES('" + starID + "', 0,"
-                        + " 0, 0, 0, 0, 0,"
-                        + " 0, 0, 0, 0, 0,"
-                        + " 0);");
-
-            }
-        } catch (SQLException ex) {
-            System.err.println("StartupListener failed to populate queryList table exception: " + ex);
-        }
-        
-        System.out.println("Exiting StartupListener - populateQueryTable");
-    }
+    }  
 }

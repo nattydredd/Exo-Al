@@ -1,0 +1,57 @@
+<div class="content">
+
+    <header class="pageHeader">
+        <h1>Admin</h1> 
+    </header>
+
+    <div class="container">
+        <h2 class="sectionHeader">Classifier Controls</h2>
+
+        <div class="controlBox">
+            <ul class="controls" id="adminControls">
+                <li>
+                    <button class="button" id="buildBtn"><span>Build</span></button>
+                </li>
+                <li>
+                    <button class="button" id="queryBtn"><span>Query</span></button>
+                </li>
+                <li>
+                    <button class="button" id="testBtn"><span>Test</span></button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <hr>
+
+    <script>
+
+        //Build button
+        $(document).on("click", "#buildBtn", function () {
+
+            //Build the classifier on current training set
+            $.post("/ClassifyManager", {action: "build"}, function (responseText) {
+                console.log("Build button response: " + responseText);
+
+            });
+        });
+        
+        //Query button
+        $(document).on("click", "#queryBtn", function () {
+
+            //Query the classifier on current validation set
+            $.post("/ClassifyManager", {action: "query"}, function (responseText) {
+                console.log("Query button response: " + responseText);
+
+            });
+        });
+        
+        //Test button
+        $(document).on("click", "#testBtn", function () {
+
+            //Test the classifier on test set
+            $.post("/ClassifyManager", {action: "test"}, function (responseText) {
+                console.log("Test button response: " + responseText);
+
+            });
+        });
+    </script>

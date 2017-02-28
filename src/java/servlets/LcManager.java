@@ -3,7 +3,6 @@ package servlets;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,6 +36,9 @@ public class LcManager extends HttpServlet {
     //Global query list
     private ArrayList<String> queryList;
 
+    //Query limit
+    private final int queryLimit  = 5;
+    
     //Session
     HttpSession session;
 
@@ -134,7 +136,7 @@ public class LcManager extends HttpServlet {
         }
 
         //Send light curve path as response
-        getServletContext().log("Sending response " + responseText);
+        getServletContext().log("Sending response: " + responseText);
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(responseText);
@@ -212,7 +214,6 @@ public class LcManager extends HttpServlet {
         getServletContext().log("Entering LcManager - createSessionLcList");
 
         //Check global query list exists
-        context = getServletContext();
         if (!Collections.list(context.getAttributeNames()).contains("QueryList")) {
             getServletContext().log("Global query list does not exist!");
             getServletContext().log("Exiting LcManager - createSessionLcList");
@@ -410,7 +411,7 @@ public class LcManager extends HttpServlet {
             int totalDecisionValue = getStarDecisionTotal(starID);
 
             //If decision count maxiumum has not been reached record submitted result
-            if (decisionCount <= 9) {
+            if (decisionCount <= (queryLimit - 1)) {
                 //Update the table with the submitted decision value, new decision count and total
                 bean.executeSQLUpdate("UPDATE queryList SET "
                         + "classVal_" + (decisionCount + 1) + "='" + decisionValue + "',"
@@ -419,7 +420,7 @@ public class LcManager extends HttpServlet {
                         + " WHERE starID='" + starID + "'");
             }
             //If decision count is/will be at maxiumum, remove the star from the global query list
-            if ((decisionCount + 1) >= 10) {
+            if ((decisionCount + 1) >= queryLimit) {
                 getServletContext().log("Removing current star from global query list");
 
                 //Check global query list exists

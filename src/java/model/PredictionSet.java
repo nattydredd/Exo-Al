@@ -11,6 +11,7 @@ public class PredictionSet {
     private double nonHostDistribution;
     private double hostDistribution;
     private boolean error;
+    
     //Constructors
     public PredictionSet() {
     }
@@ -72,6 +73,7 @@ public class PredictionSet {
     public void setHostDistribution(boolean error) {
         this.error = error;
     }
+    
     @Override
     public String toString() {
         return "PredictionSet{" + " starID = " + starID + ", actualClass = " + actualClass + ", predictedClass = " + predictedClass + ", nonHostDistribution = " + nonHostDistribution + ", hostDistribution = " + hostDistribution + ", error = " + error + '}';

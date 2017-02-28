@@ -36,7 +36,7 @@ public class Controller extends HttpServlet {
             case "/docs/":
                 include = "home.html";
                 break;
-                
+
             case "/docs/home":
                 include = "home.html";
                 break;
@@ -51,6 +51,10 @@ public class Controller extends HttpServlet {
 
             case "/docs/results":
                 include = "results.html";
+                break;
+
+            case "/docs/admin":
+                include = "admin.html";
                 break;
 
             default:

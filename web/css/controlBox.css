@@ -8,7 +8,6 @@
 
 ul.controls {
     border: none;
-    width: 70%;
     margin: auto;
 }
 
@@ -38,9 +37,13 @@ ul.controls li {
     transition: 0.5s;
 }
 
-/*Submit Button*/
-#submitBtn:hover span {  
+.button:hover span {  
     color: var(--navBarMenuTextHoverColor);
+}
+
+/*Classify*/
+#adminControls {
+    width: 70%;
 }
 
 /*Next Button*/
@@ -117,4 +120,9 @@ ul.controls li {
 
 #handle:focus, #handle:active {
     outline: none;
+}
+
+/*Admin*/
+#adminControls {
+    width: 100%;
 }
