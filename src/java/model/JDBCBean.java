@@ -175,7 +175,7 @@ public class JDBCBean implements Serializable {
     }
 
     //Returns results of SQL Query for the given parameter
-    public ArrayList sqlQueryToArrayList(String sqlStatement) throws SQLException {
+    public ArrayList<ArrayList<Object>> sqlQueryToArrayList(String sqlStatement) throws SQLException {
 
         resultSet = executeSQLQuery(sqlStatement);
 

@@ -2,12 +2,10 @@ package listeners;
 
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import model.JDBCBean;
-import model.StarClassifier;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -60,8 +58,18 @@ public class StartupListener implements ServletContextListener {
             //Set initial results flag to false
             context.setAttribute("InitialResultsFlag", false);
 
+            //Set session counter to 0
+            context.setAttribute("SessionCounter", 0);
+            
+            //Set user classifications/correct/incorrect count to 0
+            context.setAttribute("UserClassificationCount", 0);
+            context.setAttribute("UserClassificationCorrect", 0);
+            context.setAttribute("UserClassificationIncorrect", 0);
+            
             //Generate table in database for query list
             createQueryTable();
+            //Generate table in database for user classified stars
+            createClassifiedTable();
 
         } catch (Exception ex) {
             System.err.println("StartupListener contextInitialized exception: " + ex);
@@ -102,8 +110,8 @@ public class StartupListener implements ServletContextListener {
 
         try {
             //Create new table
-            bean.executeSQLUpdate("DROP TABLE IF EXISTS `queryList`;");
-            bean.executeSQLUpdate("CREATE TABLE IF NOT EXISTS `queryList` ("
+            bean.executeSQLUpdate("DROP TABLE IF EXISTS `queryTable`;");
+            bean.executeSQLUpdate("CREATE TABLE IF NOT EXISTS `queryTable` ("
                     + " `starID` text CHARACTER SET ascii NOT NULL,"
                     + " `decisionCount` int NOT NULL,"
                     + " `classVal_1` int NOT NULL,"
@@ -120,5 +128,32 @@ public class StartupListener implements ServletContextListener {
         }
 
         System.out.println("Exiting StartupListener - createQueryTable");
-    }  
+    }
+    
+    //Create new database table for stars classified by users
+    public void createClassifiedTable() {
+    System.out.println("Entering StartupListener - createQueryTable");
+
+        try {
+            //Create new table
+            bean.executeSQLUpdate("DROP TABLE IF EXISTS `classifiedTable`;");
+            bean.executeSQLUpdate("CREATE TABLE IF NOT EXISTS `classifiedTable` ("
+                    + " `starID` text CHARACTER SET ascii NOT NULL,"
+                    + " `decisionCount` int NOT NULL,"
+                    + " `classVal_1` int NOT NULL,"
+                    + " `classVal_2` int NOT NULL,"
+                    + " `classVal_3` int NOT NULL,"
+                    + " `classVal_4` int NOT NULL,"
+                    + " `classVal_5` int NOT NULL,"
+                    + " `total` int NOT NULL,"
+                    + " `class` int NOT NULL,"
+                    + " PRIMARY KEY (`starID`(15))"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
+
+        } catch (SQLException ex) {
+            System.err.println("StartupListener failed to create classifiedList table exception: " + ex);
+        }
+
+        System.out.println("Exiting StartupListener - createQueryTable");
+    }
 }

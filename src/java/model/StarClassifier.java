@@ -88,9 +88,12 @@ public class StarClassifier {
 
         //Anonymise class label
         if (anonymiseFlag) {
-            for (int i = 0; i < data.size(); i++) {
-                data.get(i).setClassMissing();
+            //Copy data so we do not lose original class labels
+            Instances tmpData = new Instances(data);
+            for (int i = 0; i < tmpData.size(); i++) {
+                tmpData.get(i).setClassMissing();
             }
+            data = new Instances(tmpData);
         }
 
         try {
@@ -99,7 +102,7 @@ public class StarClassifier {
                 System.err.println("No classifier has been built yet!");
                 return false;
             }
-            
+
             //Evaluate classifier
             evaluation = new Evaluation(data);
             evaluation.evaluateModel(classifier, data);

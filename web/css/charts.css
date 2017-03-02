@@ -12,7 +12,7 @@
 
 /*Pie Chart*/
 .arc {
-    stroke: var(--mainBackgroundColor);
+    stroke: black;
     stroke-width: 1px;
 }
 

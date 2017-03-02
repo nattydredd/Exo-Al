@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,16 +13,29 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "Controller", urlPatterns = {"/index", "/docs/*"})
 public class Controller extends HttpServlet {
 
+    //Servlet context variable
+    private ServletContext context;
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         getServletContext().log("----------------------------------------");
         getServletContext().log("Entering Controller processRequest...");
 
+        //Get servlet context
+        context = request.getServletContext();
+        
         //Get or create session
         HttpSession session = request.getSession();
         getServletContext().log("Session ID " + session.getId());
-        session.setMaxInactiveInterval(30);
+        //If session is new increase session counter
+        if (session.isNew()) {
+            int sessionCounter = (int) context.getAttribute("SessionCounter");
+            sessionCounter++;
+            context.setAttribute("SessionCounter", sessionCounter);
 
+            session.setMaxInactiveInterval(30);
+        }
+        
         //Always Forward to main.jsp
         String mainPage = "/WEB-INF/docs/main.jsp";
 

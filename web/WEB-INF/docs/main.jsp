@@ -19,6 +19,7 @@
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/timeseries.js" charset="utf-8"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/pieChart.js" charset="utf-8"></script>
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/confusionMatrix.js" charset="utf-8"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/table.js" charset="utf-8"></script>
     </head>
 
     <body>

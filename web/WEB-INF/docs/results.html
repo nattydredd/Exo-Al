@@ -5,7 +5,7 @@
     </header>
 
     <div class="container">
-        <h2 class="sectionHeader"><span id="resultsLabel_InitialResults"></span></h2>
+        <h2 class="sectionHeader">Initial Results: <span id="resultsMessage_InitialResults"></span></h2>
         <div class="chartContainer" id="pieChartContainer_InitialResults"></div>
         <div class="chartContainer" id="confusionMatrixContainer_InitialResults"></div>
         <h2 class="sectionHeader">
@@ -17,7 +17,7 @@
     </div>
 
     <div class="container">
-        <h2 class="sectionHeader"><span id="resultsLabel_CurrentResults"></span></h2>
+        <h2 class="sectionHeader">Current Results: <span id="resultsMessage_CurrentResults"></span></h2>
         <div class="chartContainer" id="pieChartContainer_CurrentResults"></div>
         <div class="chartContainer" id="confusionMatrixContainer_CurrentResults"></div>
         <h2 class="sectionHeader">
@@ -41,27 +41,30 @@
     //Requests results in JSON format and calls displayResults
     function getResults(resultSet) {
         var responseObj
-        
+
         console.log("Requesting result set: " + resultSet);
         $.post("/ClassifyManager", {action: "getResults", resultSet: resultSet}, function (responseText) {
             console.log("ClassifyManager response: " + responseText);
 
-            //If response text is valid display results
-            if (responseText !== "null" && !!responseText) {
-                //Parse JSON and pass to displayResults
-                responseObj = JSON.parse(responseText);
-                displayResults(responseObj, resultSet);
-            } else {
-                document.getElementById("resultsLabel_" + resultSet).innerHTML = "No Results Yet!";
+            //If response text is valid
+            if (!!responseText) {
+                //If response text is valid JSON
+                if (isJSON(responseText)) {
+                    
+                    //Parse JSON and pass to displayResults
+                    responseObj = JSON.parse(responseText);
+                    displayResults(responseObj, resultSet);
+                }
+                //Else display response message 
+                else {
+                    document.getElementById("resultsMessage_" + resultSet).innerHTML = responseText;
+                }
             }
         });
     }
-    
+
     //Renders pie chart, confuarion matrix and other result text
     function displayResults(responseObj, resultSet) {
-        //Title
-        var label = responseObj.resultSetLabel == "InitialResults" ? "Initial Results" : "Current Results";
-        document.getElementById("resultsLabel_" + resultSet).innerHTML = label;
 
         //Pie chart
         var pieData = [{"label": "Correct", "value": responseObj.correctPercent},
@@ -77,4 +80,15 @@
         document.getElementById("totalNumLabel_" + resultSet).innerHTML = responseObj.totalNumInstances;
     }
 
+    //Checks if given string is valid JSON or not
+    function isJSON(string) {
+
+        var returnVal = true;
+        try {
+            JSON.parse(string);
+        } catch (e) {
+            returnVal = false;
+        }
+        return returnVal;
+    }
 </script>

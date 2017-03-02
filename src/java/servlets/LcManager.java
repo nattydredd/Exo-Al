@@ -71,13 +71,18 @@ public class LcManager extends HttpServlet {
         //Get or create session
         session = request.getSession();
         getServletContext().log("Session ID " + session.getId());
-        session.setMaxInactiveInterval(30);
 
         //If session is new, generate list of light curves, get current star and current light curve
         if (session.isNew()) {
+            //If session is new increase session counter
+            int sessionCounter = (int) context.getAttribute("SessionCounter");
+            sessionCounter++;
+            context.setAttribute("SessionCounter", sessionCounter);
+
             //If global query list is not empty
             //Set action to get current light curve (rather than next, back or submit)
             action = generateNewSessionVariables(session) ? "getCurrentLc" : "queryListEmpty";
+            session.setMaxInactiveInterval(30);
 
         } //Else get light curve list, current star and current light curve
         else {
@@ -360,8 +365,8 @@ public class LcManager extends HttpServlet {
 
         //Record submitted value for current star
         if (currentStar != null) {
-            getServletContext().log("Updating queryListTable for star: " + currentStar + " with value " + sliderValue);
-            updateQueryListTable(currentStar, sliderValue);
+            getServletContext().log("Updating queryTable for star: " + currentStar + " with value " + sliderValue);
+            updateQueryTable(currentStar, sliderValue);
         }
 
         //Remove star from this session     
@@ -395,10 +400,10 @@ public class LcManager extends HttpServlet {
         return relativeLcPath + currentStar + "/" + currentLc;
     }
 
-    //Adds submitted slider value for current star to queryList table and updates decision count
+    //Adds submitted slider value for current star to queryTable and updates decision count
     //Removes current star from global query list if number of classifications >= 10
-    private void updateQueryListTable(String starID, String sliderValue) {
-        getServletContext().log("Entering LcManager - updateQueryList");
+    private void updateQueryTable(String starID, String sliderValue) {
+        getServletContext().log("Entering LcManager - updateQueryTable");
 
         try {
             //Convert submitted slider value to double
@@ -413,7 +418,7 @@ public class LcManager extends HttpServlet {
             //If decision count maxiumum has not been reached record submitted result
             if (decisionCount <= (queryLimit - 1)) {
                 //Update the table with the submitted decision value, new decision count and total
-                bean.executeSQLUpdate("UPDATE queryList SET "
+                bean.executeSQLUpdate("UPDATE queryTable SET "
                         + "classVal_" + (decisionCount + 1) + "='" + decisionValue + "',"
                         + "decisionCount='" + (decisionCount + 1) + "',"
                         + "total='" + (decisionValue + totalDecisionValue) + "'"
@@ -437,9 +442,9 @@ public class LcManager extends HttpServlet {
             }
 
         } catch (SQLException ex) {
-            System.err.println("LcManager failed to updateQueryList exception: " + ex);
+            System.err.println("LcManager failed to updateQueryTable exception: " + ex);
         }
-        getServletContext().log("Exiting LcManager - updateQueryList");
+        getServletContext().log("Exiting LcManager - updateQueryTable");
     }
 
     //Retreive the current number of classification decisions for the give stars ID
@@ -449,7 +454,7 @@ public class LcManager extends HttpServlet {
         int result = 0;
         ArrayList queryResult;
         try {
-            queryResult = (ArrayList) bean.sqlQueryToArrayList("SELECT decisionCount FROM queryList WHERE starID='" + starID + "'").get(0);
+            queryResult = (ArrayList) bean.sqlQueryToArrayList("SELECT decisionCount FROM queryTable WHERE starID='" + starID + "'").get(0);
             result = (int) queryResult.get(0);
         } catch (SQLException ex) {
             System.err.println("LcManager failed to getStarDecisionCount exception: " + ex);
@@ -466,7 +471,7 @@ public class LcManager extends HttpServlet {
         int result = 0;
         ArrayList queryResult;
         try {
-            queryResult = (ArrayList) bean.sqlQueryToArrayList("SELECT total FROM queryList WHERE starID='" + starID + "'").get(0);
+            queryResult = (ArrayList) bean.sqlQueryToArrayList("SELECT total FROM queryTable WHERE starID='" + starID + "'").get(0);
             result = (int) queryResult.get(0);
         } catch (SQLException ex) {
             System.err.println("LcManager failed to getStarDecisionCount exception: " + ex);
