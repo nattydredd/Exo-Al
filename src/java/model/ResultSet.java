@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class ResultSet {
 
     //Variables
+    private String name;
     private double correct;
     private double correctPercent;
     private double incorrect;
@@ -17,8 +18,16 @@ public class ResultSet {
     //Constructors   
     public ResultSet() {
     }
-    
+
     //Methods
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public double getCorrect() {
         return correct;
     }
@@ -74,7 +83,7 @@ public class ResultSet {
     public void setPredictions(ArrayList<PredictionSet> predictions) {
         this.predictions = predictions;
     }
-        
+
     //Returns list of star Id's that have been classified with confidence below supplied threshold
     public ArrayList generateQueryList(double confidenceThreshold) {
         System.out.println("Entering ResultSet - generateQueryList");
@@ -98,9 +107,7 @@ public class ResultSet {
                 queryList.add(String.valueOf(prediction.getStarID()));
             }
         }
-        
-        System.out.println("Query List Length " + queryList.size());
-        System.out.println("Query List " + queryList);
+
         System.out.println("Exiting ResultSet - generateQueryList");
         return queryList;
     }

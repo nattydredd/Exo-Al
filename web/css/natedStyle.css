@@ -39,7 +39,6 @@ hr {
 
 .pageHeader{
     padding-top: 70px;
-    /*padding-left: 50px;*/
     padding-bottom: 20px;
     color: white;
     width: 90%;
@@ -56,4 +55,17 @@ hr {
 .container {
     width: 100%;
     white-space: nowrap
+}
+
+/* Tables */
+table {
+    width: 90%;
+    margin: auto;
+    color: white;
+    text-align: center;
+}
+
+th {
+    background-color: var(--navBarBackgroundColor);
+    color: var()--navBarMenuTextColor);
 }

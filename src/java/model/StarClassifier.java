@@ -7,13 +7,13 @@ import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
-import weka.filters.supervised.instance.Resample;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class StarClassifier {
 
     //Classifier variables
     private FilteredClassifier classifier;
+    private Evaluation evaluation;
     private ResultSet resultSet;
 
     //Constructors   
@@ -27,6 +27,14 @@ public class StarClassifier {
 
     public void setClassifier(FilteredClassifier classifier) {
         this.classifier = classifier;
+    }
+
+    public Evaluation getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(Evaluation evaluation) {
+        this.evaluation = evaluation;
     }
 
     public ResultSet getResultSet() {
@@ -71,8 +79,8 @@ public class StarClassifier {
         System.out.println("Exiting StarClassifier - buildClassifier");
     }
 
-    //Evaluates pre-built classifier on given instances and saves results, anonFlag anonymises the class label
-    public void evaluateClassifier(Instances data, boolean anonymiseFlag) {
+    //Evaluates pre-built classifier on given instances and saves results, anonymiseFlag anonymises the class label
+    public boolean evaluateClassifier(Instances data, boolean anonymiseFlag) {
         System.out.println("Entering StarClassifier - evaluateClassifier");
 
         //Set class index
@@ -80,45 +88,61 @@ public class StarClassifier {
 
         //Anonymise class label
         if (anonymiseFlag) {
-            for (int i = 0; i < data.size(); i++) {
-                data.get(i).setClassMissing();
+            //Copy data so we do not lose original class labels
+            Instances tmpData = new Instances(data);
+            for (int i = 0; i < tmpData.size(); i++) {
+                tmpData.get(i).setClassMissing();
             }
+            data = new Instances(tmpData);
         }
 
         try {
+            //Check classifier has been built
+            if (classifier == null) {
+                System.err.println("No classifier has been built yet!");
+                return false;
+            }
+
             //Evaluate classifier
-            Evaluation eval = new Evaluation(data);
-            eval.evaluateModel(classifier, data);
+            evaluation = new Evaluation(data);
+            evaluation.evaluateModel(classifier, data);
 
-            //Save results
-            saveResults(eval, data);
-
-            System.out.println(eval.toSummaryString());
-            System.out.println(eval.toMatrixString());
-            System.out.println(eval.toClassDetailsString());
+            //Display results
+            System.out.println(evaluation.toSummaryString());
+            System.out.println(evaluation.toMatrixString());
+            System.out.println(evaluation.toClassDetailsString());
 
         } catch (Exception ex) {
             System.err.println("StarClassifier evaluateClassifier exception: " + ex);
         }
 
         System.out.println("Exiting StarClassifier - evaluateClassifier");
+        return true;
     }
 
     //Saves results of evaluated classifier
-    private void saveResults(Evaluation eval, Instances data) {
+    public void saveResults(Instances data, String resultSetName) {
         System.out.println("Entering StarClassifier - saveResults");
 
+        //Check classifier has been evaluated
+        if (evaluation == null) {
+            System.err.println("No evaluation has been made yet!");
+            return;
+        }
+
         this.resultSet = new ResultSet();
+
         //Results variables
-        this.resultSet.setCorrect(eval.correct());
-        this.resultSet.setCorrectPercent(eval.pctCorrect());
-        this.resultSet.setIncorrect(eval.incorrect());
-        this.resultSet.setIncorrectPercent(eval.pctIncorrect());
-        this.resultSet.setTotalNumInstances(eval.numInstances());
-        this.resultSet.setConfusionMatrix(eval.confusionMatrix());
+        this.resultSet.setName(resultSetName);
+        this.resultSet.setCorrect(this.evaluation.correct());
+        this.resultSet.setCorrectPercent(this.evaluation.pctCorrect());
+        this.resultSet.setIncorrect(this.evaluation.incorrect());
+        this.resultSet.setIncorrectPercent(this.evaluation.pctIncorrect());
+        this.resultSet.setTotalNumInstances(this.evaluation.numInstances());
+        this.resultSet.setConfusionMatrix(this.evaluation.confusionMatrix());
 
         //Get predictions from evaluation object
-        ArrayList<Prediction> classifierPredictions = eval.predictions();
+        ArrayList<Prediction> classifierPredictions = this.evaluation.predictions();
         Prediction prediction;
         String[] predTokens;
 
@@ -149,7 +173,7 @@ public class StarClassifier {
 
             predictions.add(new PredictionSet(starID, actualClass, predictedClass, nonHostDistribution, hostDistribution, error));
         }
-        
+
         //Add to result set
         this.resultSet.setPredictions(predictions);
 

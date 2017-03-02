@@ -1,0 +1,176 @@
+<div class="content">
+
+    <header class="pageHeader">
+        <h1>Admin</h1> 
+    </header>
+
+    <div class="container">
+        <h2 class="sectionHeader">Classifier Controls</h2>
+        <div class="controlBox">
+            <ul class="controls" id="adminControls">
+                <li>
+                    <button class="button" id="buildBtn"><span>Build</span></button>
+                </li>
+                <li>
+                    <button class="button" id="queryBtn"><span>Query</span></button>
+                </li>
+                <li>
+                    <button class="button" id="resampleBtn"><span>Resample</span></button>
+                </li>
+                <li>
+                    <button class="button" id="testBtn"><span>Test</span></button>
+                </li>
+            </ul>
+        </div>
+        <br>
+        <h2 class="sectionHeader"><span id="adminResponseMessage"></span></h2>
+        <hr>
+    </div>
+
+    <div class="container">
+        <h2 class="sectionHeader">Usage Statistics</h2>
+        <h2 class="sectionHeader">
+            Sessions: <span id="sessionCounter"></span><br>
+            Classified: <span id="userClassificationCount"></span><br>
+            Correctly Classified: <span id="userClassificationCorrect"></span><br>
+            Incorrectly Classified: <span id="userClassificationIncorrect"></span><br>
+        </h2>
+        <hr>
+    </div>
+
+    <div class="container" >
+        <h2 class="sectionHeader">Query Table</h2>
+        <div id="queryTable"></div>
+        <hr>
+    </div>
+
+    <div class="container" >
+        <h2 class="sectionHeader">Classified Table</h2>
+        <div id="classifiedTable"></div>
+        <hr>
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+
+            //Get user classification stats and query/classifcation tables
+            getUsageStats().done(function () {
+                getTable("classifiedTable").done(function () {
+                    getTable("queryTable");
+                });
+            });
+        });
+
+        //Build button
+        $(document).on("click", "#buildBtn", function () {
+            //Build the classifier on current training set
+            buttonClick("build");
+        });
+
+        //Query button
+        $(document).on("click", "#queryBtn", function () {
+            //Query the classifier on current validation set
+            buttonClick("query");
+            //Update page
+            location.reload();
+        });
+
+        //Query button
+        $(document).on("click", "#resampleBtn", function () {
+            //Query the classifier on current validation set
+            buttonClick("resample");
+            //Update page
+            location.reload();
+        });
+
+        //Test button
+        $(document).on("click", "#testBtn", function () {
+            //Test the classifier on test set
+            buttonClick("test");
+        });
+
+        function buttonClick(action) {
+            $.post("/ClassifyManager", {action: action}, function (responseText) {
+                console.log("ClassifierManager " + action + " response: " + responseText);
+                //Display results message
+                document.getElementById("adminResponseMessage").innerHTML = responseText;
+            });
+        }
+
+        function getUsageStats() {
+
+            //Create new deferred object
+            var def = new $.Deferred();
+
+            $.post("/ClassifyManager", {action: "getUsageStats"}, function (responseText) {
+                console.log("ClassifierManager getUsageStats response: " + responseText);
+
+                //If response text is valid
+                if (!!responseText) {
+                    //If response text is valid JSON
+                    if (isJSON(responseText)) {
+
+                        //Parse JSON and display
+                       var responseObj = JSON.parse(responseText);
+
+                        //Display stats
+                        document.getElementById("sessionCounter").innerHTML = responseObj.sessionCounter;
+                        document.getElementById("userClassificationCount").innerHTML = responseObj.userClassificationCount;
+                        document.getElementById("userClassificationCorrect").innerHTML = responseObj.userClassificationCorrect;
+                        document.getElementById("userClassificationIncorrect").innerHTML = responseObj.userClassificationIncorrect;
+                    }
+                    //Else display response message 
+                    else {
+                        document.getElementById("adminResponseMessage").innerHTML = responseText;
+                    }
+                }
+                //Resolve deferred
+                def.resolve();
+            });
+
+            //Return promise
+            return def.promise();
+        }
+
+        function getTable(table) {
+
+            //Create new deferred object
+            var def = new $.Deferred();
+
+            $.post("/ClassifyManager", {action: "getTable", table: table}, function (responseText) {
+                console.log("ClassifierManager getTable response: " + responseText);
+
+                //If response text is valid
+                if (!!responseText) {
+                    //If response text is valid JSON
+                    if (isJSON(responseText)) {
+
+                        //Parse JSON and pass to renderTable
+                        var responseObj = JSON.parse(responseText);
+
+                        //Display table
+                        renderTable(responseObj, "#" + table);
+
+                        //Resolve deferred
+                        def.resolve();
+                    }
+                }
+            });
+
+            //Return promise
+            return def.promise();
+        }
+
+        //Checks if given string is valid JSON or not
+        function isJSON(string) {
+
+            var returnVal = true;
+            try {
+                JSON.parse(string);
+            } catch (e) {
+                returnVal = false;
+            }
+            return returnVal;
+        }
+    </script>

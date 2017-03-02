@@ -14,6 +14,9 @@
             <li>
                 <a href="${pageContext.request.contextPath}/results"><span>Results</span></a>
             </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/admin"><span>Admin</span></a>
+            </li>
         </ul>
     </div>
 </nav>

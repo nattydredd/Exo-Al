@@ -5,60 +5,99 @@
     </header>
 
     <div class="container">
-        <h2 class="sectionHeader"><span id="resultsLabel_1"></span></h2>
-        <div class="chartContainer" id="pieChartContainer_1"></div>
-        <div class="chartContainer" id="confusionMatrixContainer_1"></div>
+        <h2 class="sectionHeader">Initial Results: <span id="resultsMessage_InitialResults"></span></h2>
+        <div class="chartContainer" id="pieChartContainer_InitialResults"></div>
+        <div class="chartContainer" id="confusionMatrixContainer_InitialResults"></div>
         <h2 class="sectionHeader">
-            Correct: <span id="correctLabel_1"></span><br>
-            Incorrect <span id="incorrectLabel_1"></span><br>
-            Total: <span id="totalNumLabel_1"></span><br>
+            Correct: <span id="correctLabel_InitialResults"></span><br>
+            Incorrect: <span id="incorrectLabel_InitialResults"></span><br>
+            Total: <span id="totalNumLabel_InitialResults"></span><br>
         </h2>
         <hr>
     </div>
 
     <div class="container">
-        <h2 class="sectionHeader"><span id="resultsLabel_2"></span></h2>
-        <div class="chartContainer" id="pieChartContainer_2"></div>
-        <div class="chartContainer" id="confusionMatrixContainer_2"></div>
+        <h2 class="sectionHeader">Current Results: <span id="resultsMessage_CurrentResults"></span></h2>
+        <div class="chartContainer" id="pieChartContainer_CurrentResults"></div>
+        <div class="chartContainer" id="confusionMatrixContainer_CurrentResults"></div>
         <h2 class="sectionHeader">
-            Correct: <span id="correctLabel_2"></span><br>
-            Incorrect: <span id="incorrectLabel_2"></span><br>
-            Total: <span id="totalNumLabel_2"></span><br>
+            Correct: <span id="correctLabel_CurrentResults"></span><br>
+            Incorrect: <span id="incorrectLabel_CurrentResults"></span><br>
+            Total: <span id="totalNumLabel_CurrentResults"></span><br>
         </h2>
+        <hr>
     </div>
-
-    <script>
-
-        $(document).ready(function () {
-
-            var responseObj;
-
-            $.post("/ClassifyManager", {action: ""}, function (responseText) {
-                console.log("ClassifyManager response: " + responseText);
-                responseObj = JSON.parse(responseText);
-                displayResults(responseObj, 1);
-            });
-        });
-
-        function displayResults(responseObj, id) {
-            //Title
-            document.getElementById("resultsLabel_" + id).innerHTML = responseObj.resultSetLabel;
-
-            //Pie chart
-            var pieData = [{"label": "Correct", "value": responseObj.correctPercent},
-                {"label": "Inorrect", "value": responseObj.incorrectPercent}];
-            renderPieChart(pieData, d3.select("#pieChartContainer_" + id));
-
-            //Confusion matrix
-            renderConfusionMatrix(responseObj.matrix, d3.select("#confusionMatrixContainer_" + id));
-
-            //Number correct/incorrect and total
-            document.getElementById("correctLabel_" + id).innerHTML = responseObj.correct;
-            document.getElementById("incorrectLabel_" + id).innerHTML = responseObj.incorrect;
-            document.getElementById("totalNumLabel_" + id).innerHTML = responseObj.totalNumInstances;
-        }
-
-    </script>
 </div>
 
+<script>
 
+    $(document).ready(function () {
+
+        //Try and get both results sets
+        getResults("InitialResults").done(function () {
+            getResults("CurrentResults");
+        });
+    });
+
+    //Requests results in JSON format and calls displayResults
+    function getResults(resultSet) {
+
+        //Create new deferred object
+        var def = new $.Deferred();
+
+        console.log("Requesting result set: " + resultSet);
+        $.post("/ClassifyManager", {action: "getResults", resultSet: resultSet}, function (responseText) {
+            console.log("ClassifyManager response: " + responseText);
+
+            //If response text is valid
+            if (!!responseText) {
+                //If response text is valid JSON
+                if (isJSON(responseText)) {
+
+                    //Parse JSON and pass to displayResults
+                    var responseObj = JSON.parse(responseText);
+                    displayResults(responseObj, resultSet);
+                }
+                //Else display response message 
+                else {
+                    document.getElementById("resultsMessage_" + resultSet).innerHTML = responseText;
+                }
+            }
+
+            //Resolve deferred
+            def.resolve();
+        });
+
+        //Return promise
+        return def.promise();
+    }
+
+    //Renders pie chart, confuarion matrix and other result text
+    function displayResults(responseObj, resultSet) {
+
+        //Pie chart
+        var pieData = [{"label": "Correct", "value": responseObj.correctPercent},
+            {"label": "Inorrect", "value": responseObj.incorrectPercent}];
+        renderPieChart(pieData, d3.select("#pieChartContainer_" + resultSet));
+
+        //Confusion matrix
+        renderConfusionMatrix(responseObj.matrix, d3.select("#confusionMatrixContainer_" + resultSet));
+
+        //Number correct/incorrect and total
+        document.getElementById("correctLabel_" + resultSet).innerHTML = responseObj.correct;
+        document.getElementById("incorrectLabel_" + resultSet).innerHTML = responseObj.incorrect;
+        document.getElementById("totalNumLabel_" + resultSet).innerHTML = responseObj.totalNumInstances;
+    }
+
+    //Checks if given string is valid JSON or not
+    function isJSON(string) {
+
+        var returnVal = true;
+        try {
+            JSON.parse(string);
+        } catch (e) {
+            returnVal = false;
+        }
+        return returnVal;
+    }
+</script>
