@@ -34,13 +34,16 @@
     $(document).ready(function () {
 
         //Try and get both results sets
-        getResults("InitialResults");
-        getResults("CurrentResults");
+        getResults("InitialResults").done(function () {
+            getResults("CurrentResults");
+        });
     });
 
     //Requests results in JSON format and calls displayResults
     function getResults(resultSet) {
-        var responseObj
+
+        //Create new deferred object
+        var def = new $.Deferred();
 
         console.log("Requesting result set: " + resultSet);
         $.post("/ClassifyManager", {action: "getResults", resultSet: resultSet}, function (responseText) {
@@ -50,9 +53,9 @@
             if (!!responseText) {
                 //If response text is valid JSON
                 if (isJSON(responseText)) {
-                    
+
                     //Parse JSON and pass to displayResults
-                    responseObj = JSON.parse(responseText);
+                    var responseObj = JSON.parse(responseText);
                     displayResults(responseObj, resultSet);
                 }
                 //Else display response message 
@@ -60,7 +63,13 @@
                     document.getElementById("resultsMessage_" + resultSet).innerHTML = responseText;
                 }
             }
+
+            //Resolve deferred
+            def.resolve();
         });
+
+        //Return promise
+        return def.promise();
     }
 
     //Renders pie chart, confuarion matrix and other result text

@@ -1,15 +1,15 @@
 function renderTable(data, targetElement) {
-    
+
+    //Separate column labels and row data
     var columns = data.columnLabels;
-//var columns = ["Star ID","Count","Class val 1","Class val 2","Class val 3","Class val 4","Class val 5","Total"];
     var rowData = data.rowData;
-    console.log("Columns " + columns);
-    console.log("Rows " + rowData);
+
+    //Append table header and body to target element
     var table = d3.select(targetElement).append('table');
     var thead = table.append('thead');
     var tbody = table.append('tbody');
 
-    // append the header row
+    //Append the header row
     thead.append('tr')
             .selectAll('th')
             .data(columns).enter()
@@ -18,13 +18,13 @@ function renderTable(data, targetElement) {
                 return column;
             });
 
-    // create a row for each object in the data
+    //Create a row for each object in the data
     var rows = tbody.selectAll('tr')
             .data(rowData)
             .enter()
             .append('tr');
 
-    // create a cell in each row for each column
+    //Create a cell in each row for each column
     var cells = rows.selectAll('td')
             .data(function (row) {
                 return columns.map(function (column) {

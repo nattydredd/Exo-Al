@@ -409,17 +409,14 @@ public class ClassifyManager extends HttpServlet {
     private String getTable(String table) {
         getServletContext().log("Entering ClassifyManager - getTable");
 
-        //Get data for specified table
-        ArrayList<ArrayList<Object>> resultsSet = null;
-        try {
-            resultsSet = bean.sqlQueryToArrayList("Select * FROM " + table);
-        } catch (SQLException ex) {
-
-        }
-        getServletContext().log("REQUESTED TABLE DATA " + resultsSet);
-
-//        String[] columnLabels = {"Star ID","Count","Class val 1","Class val 2","Class val 3","Class val 4","Class val 5","Total"};
+        //Create lists to hoild column and row data
+        ArrayList rowData = new ArrayList();
         ArrayList columnLabels = new ArrayList();
+
+        //Create empty JSON object for returning
+        JsonObject resultObj = new JsonObject();
+
+        //Create the column labels      
         columnLabels.add("Star ID");
         columnLabels.add("Count");
         columnLabels.add("Class val 1");
@@ -428,15 +425,33 @@ public class ClassifyManager extends HttpServlet {
         columnLabels.add("Class val 4");
         columnLabels.add("Class val 5");
         columnLabels.add("Total");
-
         if (table.equalsIgnoreCase("classifiedTable")) {
             columnLabels.add("Class");
         }
-        
-        
-        ArrayList rowData = new ArrayList();
-        for (ArrayList<Object> row : resultsSet) {
 
+        //Get data for specified table
+        ArrayList<ArrayList<Object>> resultsSet = null;
+        try {
+            resultsSet = bean.sqlQueryToArrayList("Select * FROM " + table);
+        } catch (SQLException ex) {
+            System.err.println("ClassifyManager failed to get table exception: " + ex);
+        }
+        getServletContext().log("REQUESTED "+ table+" DATA " + resultsSet);
+
+        //Check requested table contains data
+        if (resultsSet.isEmpty() || resultsSet == null) {
+            getServletContext().log("Requested table " + table + " is empty!");
+
+            //If not return only the column labels
+            resultObj.add("columnLabels", gson.toJsonTree(columnLabels));
+            resultObj.add("rowData", gson.toJsonTree(rowData));
+
+            getServletContext().log("Exiting ClassifyManager - getTable");
+            return gson.toJson(resultObj);
+        }
+
+        //Get the row data        
+        for (ArrayList<Object> row : resultsSet) {
             JsonObject currentObj = new JsonObject();
             currentObj.addProperty("Star ID", (String) row.get(0));
             currentObj.addProperty("Count", (int) row.get(1));
@@ -453,10 +468,9 @@ public class ClassifyManager extends HttpServlet {
         }
 
         //Return results set in JSON format
-        JsonObject resultObj = new JsonObject();
-       
         resultObj.add("columnLabels", gson.toJsonTree(columnLabels));
         resultObj.add("rowData", gson.toJsonTree(rowData));
+
         getServletContext().log("Exiting ClassifyManager - getTable");
         return gson.toJson(resultObj);
     }

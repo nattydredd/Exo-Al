@@ -45,7 +45,7 @@
     </div>
 
     <div class="container" >
-        <h2 class="sectionHeader">CLassified Table</h2>
+        <h2 class="sectionHeader">Classified Table</h2>
         <div id="classifiedTable"></div>
         <hr>
     </div>
@@ -55,9 +55,11 @@
         $(document).ready(function () {
 
             //Get user classification stats and query/classifcation tables
-            getUsageStats();
-            getTable("queryTable");
-            getTable("classifiedTable");
+            getUsageStats().done(function () {
+                getTable("classifiedTable").done(function () {
+                    getTable("queryTable");
+                });
+            });
         });
 
         //Build button
@@ -70,12 +72,16 @@
         $(document).on("click", "#queryBtn", function () {
             //Query the classifier on current validation set
             buttonClick("query");
+            //Update page
+            location.reload();
         });
 
         //Query button
         $(document).on("click", "#resampleBtn", function () {
             //Query the classifier on current validation set
             buttonClick("resample");
+            //Update page
+            location.reload();
         });
 
         //Test button
@@ -93,6 +99,10 @@
         }
 
         function getUsageStats() {
+
+            //Create new deferred object
+            var def = new $.Deferred();
+
             $.post("/ClassifyManager", {action: "getUsageStats"}, function (responseText) {
                 console.log("ClassifierManager getUsageStats response: " + responseText);
 
@@ -102,11 +112,11 @@
                     if (isJSON(responseText)) {
 
                         //Parse JSON and display
-                        responseObj = JSON.parse(responseText);
+                       var responseObj = JSON.parse(responseText);
 
                         //Display stats
                         document.getElementById("sessionCounter").innerHTML = responseObj.sessionCounter;
-                        document.getElementById("userClassificationCount").innerHTML = responseObj.userClassificationCount
+                        document.getElementById("userClassificationCount").innerHTML = responseObj.userClassificationCount;
                         document.getElementById("userClassificationCorrect").innerHTML = responseObj.userClassificationCorrect;
                         document.getElementById("userClassificationIncorrect").innerHTML = responseObj.userClassificationIncorrect;
                     }
@@ -115,25 +125,41 @@
                         document.getElementById("adminResponseMessage").innerHTML = responseText;
                     }
                 }
+                //Resolve deferred
+                def.resolve();
             });
+
+            //Return promise
+            return def.promise();
         }
 
         function getTable(table) {
 
+            //Create new deferred object
+            var def = new $.Deferred();
+
             $.post("/ClassifyManager", {action: "getTable", table: table}, function (responseText) {
                 console.log("ClassifierManager getTable response: " + responseText);
 
-                //Parse JSON and pass to displayResults
-                var responseObj = JSON.parse(responseText);
-//                console.log("Columns data from response " + JSON.parse(responseObj.columnLabels));
-//                console.log("Row data from response " + responseObj.rowData)
-                renderTable(responseObj, "" + table);
+                //If response text is valid
+                if (!!responseText) {
+                    //If response text is valid JSON
+                    if (isJSON(responseText)) {
 
+                        //Parse JSON and pass to renderTable
+                        var responseObj = JSON.parse(responseText);
+
+                        //Display table
+                        renderTable(responseObj, "#" + table);
+
+                        //Resolve deferred
+                        def.resolve();
+                    }
+                }
             });
-        }
 
-        function getClassifiedTable() {
-
+            //Return promise
+            return def.promise();
         }
 
         //Checks if given string is valid JSON or not
