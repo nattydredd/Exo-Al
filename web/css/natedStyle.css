@@ -88,6 +88,26 @@ a:hover {
    width: 50%;
    margin-right: 40%;
 }
+
+.exampleImage {
+    width: 700px;
+    height: 400px;
+    margin-left: 50px;
+}
+
+/*.exampleLabel {
+    color: white;
+}*/
+
+.instructionImage {
+    width: 650px;
+    height: 400px;
+}
+
+.instructionLabel {
+    color: red;
+}
+
 /* Tables */
 table {
     width: 90%;
