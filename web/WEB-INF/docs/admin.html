@@ -73,7 +73,8 @@
             //Query the classifier on current validation set
             buttonClick("query");
             //Update page
-            location.reload();
+//            location.reload();
+getTable("queryTable");
         });
 
         //Query button
@@ -148,7 +149,7 @@
 
                         //Parse JSON and pass to renderTable
                         var responseObj = JSON.parse(responseText);
-
+                        
                         //Display table
                         renderTable(responseObj, "#" + table);
 

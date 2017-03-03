@@ -11,18 +11,30 @@
         <div class="controlBox">
             <ul class="controls" id="classifyControls">
                 <li>
-                    <button class="button" id="backBtn"><span>Back</span></button>
+                    <button class="button" id="backBtn" title="Shows previous light curve for this star">
+                        <span>&#10092</span>
+                    </button>
                 </li>
                 <li>
                     <div class="sliderContainer">
-                        <div  id="slider"><div id="handle" class="ui-slider-handle"></div></div>
+
+                        <div  id="slider" title="Score how likely this stars light curves contain exoplanet transitions">
+                            <label class="sliderLabel" id="leftSliderLabel">No Exoplanet</label>
+                            <div id="handle" class="ui-slider-handle"></div>
+                            <label class="sliderLabel" id="rightSliderLabel">Exoplanet</label>
+                        </div>
+
                     </div>
                 </li>
                 <li>
-                    <button class="button" id="submitBtn"><span>Submit</span></button>
+                    <button class="button" id="submitBtn" title="Submits your decision and gets the next stars light curve">
+                        <span>Submit</span>
+                    </button>
                 </li>
                 <li>
-                    <button class="button" id="nextBtn"><span>Next</span></button>
+                    <button class="button" id="nextBtn" title="Show next light curve for this star">
+                        <span>&#10093</span>
+                    </button>
                 </li>
             </ul>
         </div>
@@ -57,10 +69,10 @@
 
     //Submit button
     $(document).on("click", "#submitBtn", function () {
-        
+
         //Prevent multiple clicks
         $("#submitBtn").attr("disabled", true);
-        
+
         //Submit decision slider value for current star
         var currentValue = $("#slider").slider("option", "value");
         $.post("/LcManager", {action: "submit", sliderValue: currentValue}, function (responseText) {
@@ -73,7 +85,7 @@
 
     //Next button
     $(document).on("click", "#nextBtn", function () {
-        
+
         //Get the next light curve quarter
         $.post("/LcManager", {action: "getNextLc"}, function (responseText) {
             console.log("Get Next Light Curve: " + responseText);
@@ -83,7 +95,7 @@
 
     //Back button
     $(document).on("click", "#backBtn", function () {
-        
+
         //Get the previous light curve quarter
         $.post("/LcManager", {action: "getPrevLc"}, function (responseText) {
             console.log("Get Previous Light Curve: " + responseText);

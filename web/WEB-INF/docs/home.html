@@ -1,6 +1,101 @@
 <div class="content">
 
     <header class="pageHeader">
-        <h1>Home</h1>
+        <h1>Exo-AL</h1>
     </header>
+
+    <div class="container">
+        <h2 class="sectionHeader">Finding Exo-planets with Active Learning AI</h2>
+        <div class="textContainer">
+            <p>Welcome to the Exo-AL project! Our goal is to try and find exoplanet candidates in data<br>
+                collected by NASA's Kepler spacecraft. To accomplish this we are using an Artificial<br>
+                Intelligence system that is capable of classifying stars as either exoplanet hosts or non-<br>
+                hosts. When the AI systems 'confidence' is low for a stars classification it will ask for<br>
+                human assistance in a process called Active Learning. That's where you come in. On the<br>
+                classify page of this site you will be shown a series of stars 'light curves' and asked<br>
+                whether you think it may, or may not, be host to an orbiting exoplanet. By asking you to<br>
+                help the AI to classify stars we hope to improve its ability to classify stars in the future.<br>
+                Think of it as 'teaching' the AI to be better at its job.<br>
+                <br>
+                Don't worry if you don't know what an exoplanet or light curve is! You can find out<br>
+                more about <a href="#exoplanets">exoplanets and how we find them</a>,
+                as well as <a href="#activeLearning">active learning</a>
+                below.<br>
+                <br>
+                The <a href="/instructions"><span>Instructions</span></a>
+                page will provide you with all the information you need to start<br>
+                classifying.<br>
+                <br>
+                The <a href="/results"><span>Results</span></a>
+                page will show you the initial accuracy of the classifier (without any human<br>
+                help) and the current accuracy (with human help).<br>
+                <br>
+            </p>
+            <hr class="textDivider">
+        </div>
+    </div>
+    <a name='exoplanets'></a>
+    <div class="container">
+        <h2 class="sectionHeader">What are Exo-planets and how do we find them?</h2> 
+        <div class="textContainer">
+            <p>An exoplanet, or extrasolar planet, is a planet which orbits a star outside of the solar<br>
+                system. There are many compelling reasons to find and study exoplanets that result in a<br>
+                more detailed knowledge of our universe. The location, size and composition of<br>
+                exoplanets help refine our understanding of the development of our own solar system<br>
+                as well as others. A perhaps more exciting reason, is the possibility of discovering planet<br>
+                similar to earth, <a href="https://www.nasa.gov/press-release/nasa-telescope-reveals-largest-batch-of-earth-size-habitable-zone-planets-around">
+                    <span>or perhaps 7 as was the case for Trappist-'s astonishing recent discovery.</span></a><br>
+                <br>
+                Finding 'earth like worlds' was a primary goal of the Kepler mission, the most successful<br>
+                exoplanet discovery project to date, with ~2300 of the ~3400 confirmed planets<br>
+                attributed to the Kepler mission. Launched in March 2009 the spacecraft spend over<br>
+                four years monitoring more than 160,000 stars in a fixed region of the sky known as<br>
+                Cygnus-Lyra. By observing the same set of stars for long periods of time Kepler was able<br>
+                to accumulate data for the brightness of each star over time, also known as a 'light curve'.<br>
+                <br>
+                There <a href="https://exoplanets.nasa.gov/interactable/11/"><span>are several techniques</span></a>
+                        for discovering exoplanets but the most successful (and<br>
+                the one used by the Kepler team and this project) is the Transit Method. Detection using<br>
+                the transit method is analogous to looking for an eclipse or an event such as the transit<br>
+                of Venus. As a planet passes in front of the host star the light of the star is dimmed<br>
+                because the light is blocked by the planet. When a star is observed over a period of time,<br>
+                if a number of these 'transit events' occur at regular periods then the existence of a<br>
+                planet can be inferred. Typically the dip in intensity is around 1% or much less, for<br>
+                example observing a planet the size of earth around a similar star would result in a drop<br>
+                of only 0.01%.<br>
+                <br>
+            </p>
+            <hr class="textDivider">
+        </div>
+    </div>
+    <a name='activeLearning'></a>
+    <div class="container">
+        <h2 class="sectionHeader">What is Active Learning?</h2>     
+        <div class="textContainer">
+            <p>The traditional machine learning approach has already been shown to be highly<br>
+                successful when applied to finding exoplanets, though it has never achieved 100%<br>
+                accuracy and lacks the ability to adapt to new and possibly unusual instances of data.<br>
+                The active learning approach aims to combine two paradigms with the hope that<br>
+                their individual strengths and weakness complement each other when used together.<br>
+                The relatively slow classification ability of humans can be mitigated by the<br>
+                speed of a machine learner, and the 'inflexible' machine learning algorithm can be<br>
+                improved with the more 'sophisticated' human classification ability.<br>
+                <br>
+                This project takes your feedback (classifications) and uses it to update the AI machine<br>
+                learner and hopefully improve its classification ability when applied to future unseen<br>
+                data. The number of instances required to be shown to the user is kept to a minimum<br>
+                because only those uncertain or incorrect instances must be labelled.<br>
+                <br>
+                First the AI machine learner is trained using a set of labelled data where we know the<br>
+                stars are either exoplanet hosts or not. Then, the same AI is applied to a set of data<br>
+                where we do not know the labels and produces a 'confidence' value for its chosen label.<br>
+                For every star that it has less than 70% confidence in its chosen label it will ask users to<br>
+                make a decision and label the star as either exoplanet host or not. These decisions will<br>
+                then be used to re-train the AI and hopefully improve its ability to classify stars in the<br>
+                future.<br>
+                <br>
+            </p>
+            <hr class="textDivider">
+        </div>
+    </div>
 </div>
