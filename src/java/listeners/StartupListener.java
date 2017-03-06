@@ -32,11 +32,20 @@ public class StartupListener implements ServletContextListener {
         //Start JDBC bean
         bean = new JDBCBean();
 
-        //Get JDBC Parameters
+//        //Get JDBC Parameters (local)
+//        String driver = context.getInitParameter("JDBC-Driver");
+//        String url = context.getInitParameter("JDBC-URL");
+//        String userName = context.getInitParameter("JDBC-UserName");
+//        String password = context.getInitParameter("JDBC-Password");
+
+        //Get JDBC Parameters (AWS)
         String driver = context.getInitParameter("JDBC-Driver");
-        String url = context.getInitParameter("JDBC-URL");
-        String userName = context.getInitParameter("JDBC-UserName");
-        String password = context.getInitParameter("JDBC-Password");
+        String dbName = System.getProperty("RDS_DB_NAME");
+        String userName = System.getProperty("RDS_USERNAME");
+        String password = System.getProperty("RDS_PASSWORD");
+        String hostname = System.getProperty("RDS_HOSTNAME");
+        String port = System.getProperty("RDS_PORT");
+        String url = "jdbc:mysql://" + hostname + ":" + port + "/" + dbName;
 
         //Start JDBC
         bean.startJDBC(driver, url, userName, password);
@@ -46,26 +55,26 @@ public class StartupListener implements ServletContextListener {
 
         try {
             //Retreive datasets
-            Instances trainingSet = getDataset(context, "resources/datasets/TrainingSet.arff");
-            Instances validationSet = getDataset(context, "resources/datasets/ValidationSetTEST.arff");
-            Instances testSet = getDataset(context, "resources/datasets/TestSet.arff");
+            Instances trainingSet = getDataset(context, context.getInitParameter("TrainingSetSource"));
+            Instances validationSet = getDataset(context, context.getInitParameter("ValidationSetSource"));
+            Instances testSet = getDataset(context, context.getInitParameter("TestSetSource"));
 
             //Pass datasets to context
             context.setAttribute("TrainingSet", trainingSet);
             context.setAttribute("ValidationSet", validationSet);
-            context.setAttribute("TestSet", testSet);   
-            
+            context.setAttribute("TestSet", testSet);
+
             //Set initial results flag to false
             context.setAttribute("InitialResultsFlag", false);
 
             //Set session counter to 0
             context.setAttribute("SessionCounter", 0);
-            
+
             //Set user classifications/correct/incorrect count to 0
             context.setAttribute("UserClassificationCount", 0);
             context.setAttribute("UserClassificationCorrect", 0);
             context.setAttribute("UserClassificationIncorrect", 0);
-            
+
             //Generate table in database for query list
             createQueryTable();
             //Generate table in database for user classified stars
@@ -129,10 +138,10 @@ public class StartupListener implements ServletContextListener {
 
         System.out.println("Exiting StartupListener - createQueryTable");
     }
-    
+
     //Create new database table for stars classified by users
     public void createClassifiedTable() {
-    System.out.println("Entering StartupListener - createQueryTable");
+        System.out.println("Entering StartupListener - createQueryTable");
 
         try {
             //Create new table

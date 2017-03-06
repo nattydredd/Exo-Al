@@ -36,6 +36,5 @@
 
 .dot {
     fill: #f1fcfe;
-    /*stroke: #f1fcfe;
-    stroke-width: 0;*/
+    border-radius: 0px;    
 }

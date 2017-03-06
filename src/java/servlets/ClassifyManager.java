@@ -32,8 +32,8 @@ public class ClassifyManager extends HttpServlet {
     //Classifier
     StarClassifier classifier;
 
-    //Query threshold
-    private final double queryThreshold = 0.7;
+    //Query confidence threshold
+    private final double queryConfidenceThreshold = 0.7;
 
     //Global query list
     private ArrayList<String> queryList;
@@ -175,7 +175,7 @@ public class ClassifyManager extends HttpServlet {
     }
 
     //Applies classifier to validation set and generates query set,
-    //Populates queryList table in database with results
+    //Populates queryTable in database with results
     private String queryClassifier() {
         getServletContext().log("Entering ClassifyManager - queryClassifier");
 
@@ -201,9 +201,9 @@ public class ClassifyManager extends HttpServlet {
         classifier.saveResults(validationSet, "Evaluation");
 
         //Get list for user classification
-        ArrayList<String> queryList = classifier.getResultSet().generateQueryList(queryThreshold);
+        queryList = classifier.getResultSet().generateQueryList(queryConfidenceThreshold);
         context.setAttribute("QueryList", queryList);
-
+   
         //Populate table with stars in the query list
         updateQueryTable(queryList);
 

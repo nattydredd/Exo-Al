@@ -29,6 +29,28 @@ hr {
     border-color: var(--navBarMenuBorderColor);
     background-color: var(--navBarMenuBorderColor);
     height: 1px;
+    width: inherit;
+}
+
+p {
+    color: white;
+    text-transform: none;
+    width: inherit;
+    margin: auto;
+}
+
+a:link {
+    color: white;
+}
+
+
+a:visited {
+    color: var(--navBarMenuTextHoverColor);
+}
+
+
+a:hover {
+    color: var(--navBarMenuTextHoverColor);
 }
 
 /*Main content*/
@@ -55,6 +77,37 @@ hr {
 .container {
     width: 100%;
     white-space: nowrap
+}
+
+.textContainer {
+    width: 90%;
+    margin: inherit; 
+}
+
+.textDivider {
+   width: 50%;
+   margin-right: 40%;
+}
+
+.exampleImage {
+    width: 700px;
+    height: 400px;
+    margin-left: 50px;
+}
+
+.instructionImage {
+    width: 650px;
+    height: 400px;
+}
+
+.instructionLabel {
+    color: red;
+}
+
+.video {
+    width: 650px;
+    height: 400px;
+    margin-left: 50px;
 }
 
 /* Tables */

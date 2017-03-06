@@ -40,26 +40,21 @@
 
     <div class="container" >
         <h2 class="sectionHeader">Query Table</h2>
-        <div id="queryTable"></div>
+        <div id="tableContainer_queryTable"></div>
         <hr>
     </div>
 
     <div class="container" >
         <h2 class="sectionHeader">Classified Table</h2>
-        <div id="classifiedTable"></div>
+        <div id="tableContainer_classifiedTable"></div>
         <hr>
     </div>
 
     <script>
 
         $(document).ready(function () {
-
             //Get user classification stats and query/classifcation tables
-            getUsageStats().done(function () {
-                getTable("classifiedTable").done(function () {
-                    getTable("queryTable");
-                });
-            });
+            updatePage();
         });
 
         //Build button
@@ -71,17 +66,19 @@
         //Query button
         $(document).on("click", "#queryBtn", function () {
             //Query the classifier on current validation set
-            buttonClick("query");
-            //Update page
-            location.reload();
+            buttonClick("query").done(function () {
+                //Update page
+                updatePage();
+            });
         });
 
         //Query button
         $(document).on("click", "#resampleBtn", function () {
             //Query the classifier on current validation set
-            buttonClick("resample");
-            //Update page
-            location.reload();
+            buttonClick("resample").done(function () {
+                //Update page
+                updatePage();
+            });
         });
 
         //Test button
@@ -90,14 +87,26 @@
             buttonClick("test");
         });
 
+        //Submits button click action to ClassifyManager
         function buttonClick(action) {
+
+            //Create new deferred object
+            var def = new $.Deferred();
+
             $.post("/ClassifyManager", {action: action}, function (responseText) {
                 console.log("ClassifierManager " + action + " response: " + responseText);
                 //Display results message
                 document.getElementById("adminResponseMessage").innerHTML = responseText;
+
+                //Resolve deferred
+                def.resolve();
             });
+
+            //Return promise
+            return def.promise();
         }
 
+        //Retreives usage statistics and updates page
         function getUsageStats() {
 
             //Create new deferred object
@@ -112,7 +121,7 @@
                     if (isJSON(responseText)) {
 
                         //Parse JSON and display
-                       var responseObj = JSON.parse(responseText);
+                        var responseObj = JSON.parse(responseText);
 
                         //Display stats
                         document.getElementById("sessionCounter").innerHTML = responseObj.sessionCounter;
@@ -133,10 +142,16 @@
             return def.promise();
         }
 
+        //Retreives specified table and updates page
         function getTable(table) {
 
             //Create new deferred object
             var def = new $.Deferred();
+
+            //Remove current table
+            if (!!document.getElementById(table)) {
+                document.getElementById(table).remove();
+            }
 
             $.post("/ClassifyManager", {action: "getTable", table: table}, function (responseText) {
                 console.log("ClassifierManager getTable response: " + responseText);
@@ -150,7 +165,7 @@
                         var responseObj = JSON.parse(responseText);
 
                         //Display table
-                        renderTable(responseObj, "#" + table);
+                        renderTable(responseObj, "#tableContainer_" + table);
 
                         //Resolve deferred
                         def.resolve();
@@ -160,6 +175,15 @@
 
             //Return promise
             return def.promise();
+        }
+
+        //Updates page with usage statisitcs and tables
+        function updatePage() {
+            getUsageStats().done(function () {
+                getTable("classifiedTable").done(function () {
+                    getTable("queryTable");
+                });
+            });
         }
 
         //Checks if given string is valid JSON or not

@@ -3,9 +3,11 @@ function renderTable(data, targetElement) {
     //Separate column labels and row data
     var columns = data.columnLabels;
     var rowData = data.rowData;
-
+    var tableID = targetElement.split("_")[1];
+    
     //Append table header and body to target element
-    var table = d3.select(targetElement).append('table');
+    var table = d3.select(targetElement).append('table')
+            .attr("id", tableID);
     var thead = table.append('thead');
     var tbody = table.append('tbody');
 

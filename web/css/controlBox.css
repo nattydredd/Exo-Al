@@ -8,7 +8,16 @@
 
 ul.controls {
     border: none;
-    margin: auto;
+    margin: auto;  
+}
+
+#classifyControls {
+    width: 70%;
+    transform: translate(0px,-40px);
+}
+
+#adminControls {
+    width: 100%;
 }
 
 ul.controls li {
@@ -41,47 +50,32 @@ ul.controls li {
     color: var(--navBarMenuTextHoverColor);
 }
 
-/*Classify*/
-#adminControls {
-    width: 70%;
-}
-
 /*Next Button*/
-#nextBtn span:after {
-    content: '\00bb';
-    position: absolute;
-    opacity: 0;
-    right: -5px;  
+#nextBtn {
+    height: 100px;
+    width: 40px;
+    font-size: 400%;
+    background-color: var(--mainBackgroundColor);
+    transform: translate(370px,-320px);
 }
 
 #nextBtn:hover span {
-    padding-right: 15px;
-    color: var(--navBarMenuTextHoverColor);
-}
-
-#nextBtn:hover span:after {
-    color: var(--navBarMenuTextHoverColor);
-    opacity: 1;
-    right: 0;
-}
-
-/*Back Button*/
-#backBtn span:after {
-    content: '\00ab';
-    position: absolute;
-    opacity: 0;
-    left: -5px;
-}
-
-#backBtn:hover span {
     padding-left: 15px;
     color: var(--navBarMenuTextHoverColor);
 }
 
-#backBtn:hover span:after {
+/*Back Button*/
+#backBtn {
+    height: 100px;
+    width: 40px;
+    font-size: 400%;
+    background-color: var(--mainBackgroundColor);
+    transform: translate(-250px,-320px);
+}
+
+#backBtn:hover span {
+    padding-right: 15px;
     color: var(--navBarMenuTextHoverColor);
-    opacity: 1;
-    left: 0;
 }
 
 /*Slider*/
@@ -122,7 +116,59 @@ ul.controls li {
     outline: none;
 }
 
-/*Admin*/
-#adminControls {
-    width: 100%;
+.sliderLabel {
+    position: absolute;
+    width: 20px;
+    margin-top: 20px;
+    font-size: 80%;
+    text-align: center;
+    text-transform: none;
+    color: var(--navBarMenuTextColor);
 }
+
+#leftSliderLabel {
+    /*margin-left: -5px;*/
+}
+
+#rightSliderLabel {
+    margin-left: 325px;
+}
+
+/* Old Next and Back Butttons */
+/*Next Button*/
+/*#nextBtn span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    right: -5px;  
+}
+
+#nextBtn:hover span {
+    padding-right: 15px;
+    color: var(--navBarMenuTextHoverColor);
+}
+
+#nextBtn:hover span:after {
+    color: var(--navBarMenuTextHoverColor);
+    opacity: 1;
+    right: 0;
+}
+
+Back Button
+#backBtn span:after {
+    content: '\00ab';
+    position: absolute;
+    opacity: 0;
+    left: -5px;
+}
+
+#backBtn:hover span {
+    padding-left: 15px;
+    color: var(--navBarMenuTextHoverColor);
+}
+
+#backBtn:hover span:after {
+    color: var(--navBarMenuTextHoverColor);
+    opacity: 1;
+    left: 0;
+}*/
