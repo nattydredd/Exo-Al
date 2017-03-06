@@ -15,7 +15,7 @@
                 classify page of this site you will be shown a series of stars 'light curves' and asked<br>
                 whether you think it may, or may not, be host to an orbiting exoplanet. By asking you to<br>
                 help the AI to classify stars we hope to improve its ability to classify stars in the future.<br>
-                Think of it as 'teaching' the AI to be better at its job in the future.<br>
+                Think of it as 'teaching' the AI to be better at its job.<br>
                 <br>
                 Don't worry if you don't know what an exoplanet or light curve is! You can find out<br>
                 more about <a href="#exoplanets">exoplanets and how we find them</a>,
@@ -30,6 +30,9 @@
                 page will show you the initial accuracy the classifier achieved (without any human<br>
                 help) and the current accuracy (with human help).<br>
                 <br>
+                You will not be asked to look at a specific number of light curves, so you can classify as many<br>
+                or as few as you like. Thank you for your participation and if you have an queries please contact:<br>
+                nathan2.duran@live.uwe.ac.uk<br>
             </p>
             <hr class="textDivider">
         </div>
@@ -42,7 +45,7 @@
                 system. There are many compelling reasons to find and study exoplanets that result in a<br>
                 more detailed knowledge of our universe. The location, size and composition of<br>
                 exoplanets help refine our understanding of the development of our own solar system<br>
-                as well as others. A perhaps more exciting reason, is the possibility of discovering planet<br>
+                as well as others. A perhaps more exciting reason, is the possibility of discovering planets<br>
                 similar to earth, <a href="https://www.nasa.gov/press-release/nasa-telescope-reveals-largest-batch-of-earth-size-habitable-zone-planets-around">
                     <span>or perhaps 7 as was the case for Trappist-'s astonishing recent discovery.</span></a><br>
                 <br>
@@ -53,8 +56,15 @@
                 By observing the same set of stars for long periods of time Kepler was able to<br>
                 accumulate data for the brightness of each star over time, also known as a 'light curve'.<br>
                 <br>
-                There <a href="https://exoplanets.nasa.gov/interactable/11/"><span>are several techniques</span></a>
-                        for discovering exoplanets but the most successful (and<br>
+            </p>
+            <p>
+                Light curve for the star KIC: 757450<br>
+                <br>
+            </p>
+            <img class="exampleImage" src="/resources/images/757450.png" alt="757450">
+            <br><br>
+            <p>There <a href="https://exoplanets.nasa.gov/interactable/11/"><span>are several techniques</span></a>
+                for discovering exoplanets but the most successful (and<br>
                 the one used by the Kepler team and this project) is the Transit Method. Detection using<br>
                 the transit method is analogous to looking for an eclipse or an event such as the transit<br>
                 of Venus. As a planet passes in front of the host star the light of the star is dimmed<br>
@@ -65,6 +75,12 @@
                 of only 0.01%.<br>
                 <br>
             </p>
+            <video class="video" width="650" height="400" controls>
+                <source src="/resources/images/Transit_Method.mp4" type="video/mp4">                   
+                Your browser does not support the video tag.
+            </video>
+            <br>
+
             <hr class="textDivider">
         </div>
     </div>
@@ -89,7 +105,7 @@
                 The AI machine learner is first trained using a set of labelled data where we know the<br>
                 stars are either exoplanet hosts or not. Then, the same AI is applied to a set of data<br>
                 where we do not know the labels and produces a 'confidence' value for its chosen label.<br>
-                For every star that it has less than 70% confidence in its chosen label it will ask users to<br>
+                For every star that it has less than 70% confidence in its chosen label, it will ask users to<br>
                 make a decision and label the star as either exoplanet host or not. These decisions will<br>
                 then be used to re-train the AI and hopefully improve its ability to classify stars in the<br>
                 future.<br>

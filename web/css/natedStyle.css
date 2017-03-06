@@ -95,10 +95,6 @@ a:hover {
     margin-left: 50px;
 }
 
-/*.exampleLabel {
-    color: white;
-}*/
-
 .instructionImage {
     width: 650px;
     height: 400px;
@@ -106,6 +102,12 @@ a:hover {
 
 .instructionLabel {
     color: red;
+}
+
+.video {
+    width: 650px;
+    height: 400px;
+    margin-left: 50px;
 }
 
 /* Tables */
