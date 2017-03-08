@@ -37,8 +37,8 @@ public class LcManager extends HttpServlet {
     private ArrayList<String> queryList;
 
     //Query limit
-    private final int queryLimit  = 5;
-    
+    private final int queryLimit = 5;
+
     //Session
     HttpSession session;
 
@@ -405,6 +405,9 @@ public class LcManager extends HttpServlet {
     private void updateQueryTable(String starID, String sliderValue) {
         getServletContext().log("Entering LcManager - updateQueryTable");
 
+        //Start JDBC
+        bean.startJDBC();
+        
         try {
             //Convert submitted slider value to double
             int decisionValue = Integer.valueOf(sliderValue);
@@ -444,6 +447,10 @@ public class LcManager extends HttpServlet {
         } catch (SQLException ex) {
             System.err.println("LcManager failed to updateQueryTable exception: " + ex);
         }
+
+        //Stop JDBC
+        bean.stopJDBC();
+
         getServletContext().log("Exiting LcManager - updateQueryTable");
     }
 
