@@ -26,7 +26,7 @@
     </context-param>
     <context-param>
         <param-name>ValidationSetSource</param-name>
-        <param-value>resources/datasets/ValidationSetTEST.arff</param-value>
+        <param-value>resources/datasets/ValidationSet.arff</param-value>
     </context-param>
     <context-param>
         <param-name>TestSetSource</param-name>
@@ -72,7 +72,7 @@
     </servlet-mapping>
     <session-config>
         <session-timeout>
-            1
+            60
         </session-timeout>
     </session-config>
 </web-app>

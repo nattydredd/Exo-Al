@@ -454,10 +454,8 @@ public class ClassifyManager extends HttpServlet {
             resultsSet = bean.sqlQueryToArrayList("Select * FROM " + table);
         } catch (SQLException ex) {
             System.err.println("ClassifyManager failed to get table exception: " + ex);
-
-            //Stop JDBC
-            bean.stopJDBC();
         }
+        
         getServletContext().log("Requested " + table + " data: " + resultsSet);
 
         //Check requested table contains data
@@ -474,10 +472,7 @@ public class ClassifyManager extends HttpServlet {
             getServletContext().log("Exiting ClassifyManager - getTable");
             return gson.toJson(resultObj);
         }
-
-        //Stop JDBC
-        bean.stopJDBC();
-
+       
         //Get the row data        
         for (ArrayList<Object> row : resultsSet) {
             JsonObject currentObj = new JsonObject();
@@ -499,6 +494,9 @@ public class ClassifyManager extends HttpServlet {
         resultObj.add("columnLabels", gson.toJsonTree(columnLabels));
         resultObj.add("rowData", gson.toJsonTree(rowData));
 
+        //Stop JDBC
+        bean.stopJDBC();
+        
         getServletContext().log("Exiting ClassifyManager - getTable");
         return gson.toJson(resultObj);
     }
@@ -537,7 +535,7 @@ public class ClassifyManager extends HttpServlet {
                 bean.executeSQLUpdate("INSERT INTO `queryTable` (`starID`, `decisionCount`,"
                         + "`classVal_1`, `classVal_2`, `classVal_3`, `classVal_4`, `classVal_5`, "
                         + "`total`)"
-                        + "VALUES('" + starID + "', 4,"//////MAKE 0 again
+                        + "VALUES('" + starID + "', 0,"
                         + " 0, 0, 0, 0, 0,"
                         + " 0);");
             }

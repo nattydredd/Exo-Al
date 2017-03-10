@@ -82,7 +82,6 @@ public class LcManager extends HttpServlet {
             //If global query list is not empty
             //Set action to get current light curve (rather than next, back or submit)
             action = generateNewSessionVariables(session) ? "getCurrentLc" : "queryListEmpty";
-            session.setMaxInactiveInterval(30);
 
         } //Else get light curve list, current star and current light curve
         else {

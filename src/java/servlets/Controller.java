@@ -32,8 +32,6 @@ public class Controller extends HttpServlet {
             int sessionCounter = (int) context.getAttribute("SessionCounter");
             sessionCounter++;
             context.setAttribute("SessionCounter", sessionCounter);
-
-            session.setMaxInactiveInterval(30);
         }
         
         //Always Forward to main.jsp
