@@ -29,10 +29,7 @@ public class StartupListener implements ServletContextListener {
         //Get servlet context
         context = event.getServletContext();
 
-        //Start JDBC bean
-        bean = new JDBCBean();
-
-//        //Get JDBC Parameters (local)
+        //Get JDBC Parameters (local)
 //        String driver = context.getInitParameter("JDBC-Driver");
 //        String url = context.getInitParameter("JDBC-URL");
 //        String userName = context.getInitParameter("JDBC-UserName");
@@ -46,9 +43,9 @@ public class StartupListener implements ServletContextListener {
         String hostname = System.getProperty("RDS_HOSTNAME");
         String port = System.getProperty("RDS_PORT");
         String url = "jdbc:mysql://" + hostname + ":" + port + "/" + dbName;
-
-        //Start JDBC
-        bean.startJDBC(driver, url, userName, password);
+        
+        //Create JDBC bean
+        bean = new JDBCBean(driver, url, userName, password);
 
         //Pass JDBC connected bean to context
         context.setAttribute("JDBCBean", bean);
@@ -89,8 +86,7 @@ public class StartupListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        //StopJDBC bean
-        bean.stopJDBC();
+
     }
 
     //Returns Instances list variable for provided resource string
@@ -109,13 +105,15 @@ public class StartupListener implements ServletContextListener {
         }
 
         System.out.println("Exiting StartupListener - getDataset");
-
         return returnSet;
     }
 
     //Create new database table for stars in the query list
     public void createQueryTable() {
         System.out.println("Entering StartupListener - createQueryTable");
+
+        //Start JDBC
+        bean.startJDBC();
 
         try {
             //Create new table
@@ -136,12 +134,18 @@ public class StartupListener implements ServletContextListener {
             System.err.println("StartupListener failed to create queryList table exception: " + ex);
         }
 
+        //Stop JDBC
+        bean.stopJDBC();
+
         System.out.println("Exiting StartupListener - createQueryTable");
     }
 
     //Create new database table for stars classified by users
     public void createClassifiedTable() {
         System.out.println("Entering StartupListener - createQueryTable");
+
+        //Start JDBC
+        bean.startJDBC();
 
         try {
             //Create new table
@@ -162,6 +166,9 @@ public class StartupListener implements ServletContextListener {
         } catch (SQLException ex) {
             System.err.println("StartupListener failed to create classifiedList table exception: " + ex);
         }
+
+        //Stop JDBC
+        bean.stopJDBC();
 
         System.out.println("Exiting StartupListener - createQueryTable");
     }

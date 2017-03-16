@@ -57,14 +57,14 @@ public class StarClassifier {
             Remove removedAtt = new Remove();
             removedAtt.setAttributeIndices("1");
 
-            //Remove mean //???????
+            //Remove mean
             Remove removedAtt2 = new Remove();
             removedAtt2.setAttributeIndices("5");
 
             //Create classifier
             RandomForest randForest = new RandomForest();
             randForest.setOptions(weka.core.Utils.splitOptions("-P 100 -I 1000 -num-slots 1 -K 0 -M 1.0 -V 0.001 -S 1"));
-
+                
             //Create filtered classifier
             this.classifier = new FilteredClassifier();
             this.classifier.setFilter(removedAtt);

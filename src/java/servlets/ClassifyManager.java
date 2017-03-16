@@ -179,6 +179,9 @@ public class ClassifyManager extends HttpServlet {
     private String queryClassifier() {
         getServletContext().log("Entering ClassifyManager - queryClassifier");
 
+        //Start JDBC
+        bean.startJDBC();
+
         //Check classifier has been built
         if (classifier == null || classifier.getClassifier() == null) {
             getServletContext().log("Classifier has not been built yet! No query set created");
@@ -203,12 +206,15 @@ public class ClassifyManager extends HttpServlet {
         //Get list for user classification
         queryList = classifier.getResultSet().generateQueryList(queryConfidenceThreshold);
         context.setAttribute("QueryList", queryList);
-   
+
         //Populate table with stars in the query list
         updateQueryTable(queryList);
 
         getServletContext().log("Query List Length " + queryList.size());
         getServletContext().log("Query List " + queryList);
+
+        //Stop JDBC
+        bean.stopJDBC();
 
         getServletContext().log("Exiting ClassifyManager - queryClassifier");
         return "Query set generated";
@@ -217,6 +223,9 @@ public class ClassifyManager extends HttpServlet {
     //Adds user classified instances from query set into training set
     public String resample() {
         getServletContext().log("Entering ClassifyManager - resample");
+
+        //Start JDBC
+        bean.startJDBC();
 
         //Get all instances in query set that have reached query limit and have non zero classification total
         ArrayList<ArrayList<Object>> resultsSet = null;
@@ -312,6 +321,13 @@ public class ClassifyManager extends HttpServlet {
                 }
             }
         }
+
+        //Set validation and training sets
+        context.setAttribute("TrainingSet", trainingSet);
+        context.setAttribute("ValidationSet", validationSet);
+
+        //Stop JDBC
+        bean.stopJDBC();
 
         getServletContext().log("Exiting ClassifyManager - resample");
         return "Resampled instances added to training set";
@@ -409,6 +425,9 @@ public class ClassifyManager extends HttpServlet {
     private String getTable(String table) {
         getServletContext().log("Entering ClassifyManager - getTable");
 
+        //Start JDBC
+        bean.startJDBC();
+
         //Create lists to hoild column and row data
         ArrayList rowData = new ArrayList();
         ArrayList columnLabels = new ArrayList();
@@ -436,7 +455,8 @@ public class ClassifyManager extends HttpServlet {
         } catch (SQLException ex) {
             System.err.println("ClassifyManager failed to get table exception: " + ex);
         }
-        getServletContext().log("REQUESTED "+ table+" DATA " + resultsSet);
+        
+        getServletContext().log("Requested " + table + " data: " + resultsSet);
 
         //Check requested table contains data
         if (resultsSet.isEmpty() || resultsSet == null) {
@@ -446,10 +466,13 @@ public class ClassifyManager extends HttpServlet {
             resultObj.add("columnLabels", gson.toJsonTree(columnLabels));
             resultObj.add("rowData", gson.toJsonTree(rowData));
 
+            //Stop JDBC
+            bean.stopJDBC();
+
             getServletContext().log("Exiting ClassifyManager - getTable");
             return gson.toJson(resultObj);
         }
-
+       
         //Get the row data        
         for (ArrayList<Object> row : resultsSet) {
             JsonObject currentObj = new JsonObject();
@@ -471,6 +494,9 @@ public class ClassifyManager extends HttpServlet {
         resultObj.add("columnLabels", gson.toJsonTree(columnLabels));
         resultObj.add("rowData", gson.toJsonTree(rowData));
 
+        //Stop JDBC
+        bean.stopJDBC();
+        
         getServletContext().log("Exiting ClassifyManager - getTable");
         return gson.toJson(resultObj);
     }
@@ -509,7 +535,7 @@ public class ClassifyManager extends HttpServlet {
                 bean.executeSQLUpdate("INSERT INTO `queryTable` (`starID`, `decisionCount`,"
                         + "`classVal_1`, `classVal_2`, `classVal_3`, `classVal_4`, `classVal_5`, "
                         + "`total`)"
-                        + "VALUES('" + starID + "', 4,"//////MAKE 0 again
+                        + "VALUES('" + starID + "', 0,"
                         + " 0, 0, 0, 0, 0,"
                         + " 0);");
             }

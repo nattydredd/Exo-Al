@@ -37,8 +37,8 @@ public class LcManager extends HttpServlet {
     private ArrayList<String> queryList;
 
     //Query limit
-    private final int queryLimit  = 5;
-    
+    private final int queryLimit = 5;
+
     //Session
     HttpSession session;
 
@@ -82,7 +82,6 @@ public class LcManager extends HttpServlet {
             //If global query list is not empty
             //Set action to get current light curve (rather than next, back or submit)
             action = generateNewSessionVariables(session) ? "getCurrentLc" : "queryListEmpty";
-            session.setMaxInactiveInterval(30);
 
         } //Else get light curve list, current star and current light curve
         else {
@@ -405,6 +404,9 @@ public class LcManager extends HttpServlet {
     private void updateQueryTable(String starID, String sliderValue) {
         getServletContext().log("Entering LcManager - updateQueryTable");
 
+        //Start JDBC
+        bean.startJDBC();
+        
         try {
             //Convert submitted slider value to double
             int decisionValue = Integer.valueOf(sliderValue);
@@ -444,6 +446,10 @@ public class LcManager extends HttpServlet {
         } catch (SQLException ex) {
             System.err.println("LcManager failed to updateQueryTable exception: " + ex);
         }
+
+        //Stop JDBC
+        bean.stopJDBC();
+
         getServletContext().log("Exiting LcManager - updateQueryTable");
     }
 

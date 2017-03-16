@@ -26,6 +26,13 @@ public class JDBCBean implements Serializable {
 
     }
 
+    public JDBCBean(String driver, String url, String userName, String password) {
+        this.driver = driver;
+        this.url = url;
+        this.userName = userName;
+        this.password = password;
+    }
+
     //Getter's and Setter's
     public void setDriver(String driver) {
         this.driver = driver;
@@ -49,6 +56,46 @@ public class JDBCBean implements Serializable {
 
     //Methods
     //Start
+    public String startJDBC() {
+
+        //Success/Failure message
+        String result = "JDBC Started...\nConnection Successful.\n";
+
+        //Set driver, url, userName and password if not already
+        if (this.driver == null) {
+            result = "JDBC Not Started...\n" + "Driver is null";
+            return result;
+        }
+        if (this.url == null) {
+            result = "JDBC Not Started...\n" + "Url is null";
+            return result;
+        }
+        if (this.userName == null) {
+            result = "JDBC Not Started...\n" + "User Name is null";
+            return result;
+        }
+        if (this.password == null) {
+            result = "JDBC Not Started...\n" + "Password is null";
+            return result;
+        }
+
+        try {
+            //Set driver
+            Class.forName(driver);
+
+            //Make connection
+            connection = DriverManager.getConnection(url, userName, password);
+
+        } catch (SQLException e) {
+            result = "JDBC Not Started...\n" + e.toString();
+        } catch (ClassNotFoundException e) {
+            result = "JDBC Not Started...\n" + e.toString();
+        }
+
+        System.out.println(result);
+        return result;
+    }
+
     public String startJDBC(String driver, String url, String userName, String password) {
 
         //Success/Failure message
