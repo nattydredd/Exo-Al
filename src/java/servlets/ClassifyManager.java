@@ -21,7 +21,7 @@ import weka.core.Instances;
 public class ClassifyManager extends HttpServlet {
 
     //JSON converter
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
 
     //Servlet context variable
     private ServletContext context;
@@ -30,7 +30,7 @@ public class ClassifyManager extends HttpServlet {
     private JDBCBean bean;
 
     //Classifier
-    StarClassifier classifier;
+    private StarClassifier classifier;
 
     //Query confidence threshold
     private final double queryConfidenceThreshold = 0.7;
@@ -221,7 +221,7 @@ public class ClassifyManager extends HttpServlet {
     }
 
     //Adds user classified instances from query set into training set
-    public String resample() {
+    private String resample() {
         getServletContext().log("Entering ClassifyManager - resample");
 
         //Start JDBC
