@@ -54,8 +54,8 @@ public class StarClassifier {
             data.setClassIndex(data.numAttributes() - 1);
 
             //Remove Id
-            Remove removedAtt = new Remove();
-            removedAtt.setAttributeIndices("1");
+            Remove removedAtt1 = new Remove();
+            removedAtt1.setAttributeIndices("1");
 
             //Remove mean
             Remove removedAtt2 = new Remove();
@@ -64,10 +64,10 @@ public class StarClassifier {
             //Create classifier
             RandomForest randForest = new RandomForest();
             randForest.setOptions(weka.core.Utils.splitOptions("-P 100 -I 1000 -num-slots 1 -K 0 -M 1.0 -V 0.001 -S 1"));
-                
+
             //Create filtered classifier
             this.classifier = new FilteredClassifier();
-            this.classifier.setFilter(removedAtt);
+            this.classifier.setFilter(removedAtt1);
             this.classifier.setFilter(removedAtt2);
             this.classifier.setClassifier(randForest);
             this.classifier.buildClassifier(data);
@@ -83,20 +83,20 @@ public class StarClassifier {
     public boolean evaluateClassifier(Instances data, boolean anonymiseFlag) {
         System.out.println("Entering StarClassifier - evaluateClassifier");
 
-        //Set class index
-        data.setClassIndex(data.numAttributes() - 1);
-
-        //Anonymise class label
-        if (anonymiseFlag) {
-            //Copy data so we do not lose original class labels
-            Instances tmpData = new Instances(data);
-            for (int i = 0; i < tmpData.size(); i++) {
-                tmpData.get(i).setClassMissing();
-            }
-            data = new Instances(tmpData);
-        }
-
         try {
+            //Set class index
+            data.setClassIndex(data.numAttributes() - 1);
+
+            //Anonymise class label
+            if (anonymiseFlag) {
+                //Copy data so we do not lose original class labels
+                Instances tmpData = new Instances(data);
+                for (int i = 0; i < tmpData.size(); i++) {
+                    tmpData.get(i).setClassMissing();
+                }
+                data = new Instances(tmpData);
+            }
+
             //Check classifier has been built
             if (classifier == null) {
                 System.err.println("No classifier has been built yet!");
@@ -104,8 +104,8 @@ public class StarClassifier {
             }
 
             //Evaluate classifier
-            evaluation = new Evaluation(data);
-            evaluation.evaluateModel(classifier, data);
+            this.evaluation = new Evaluation(data);
+            this.evaluation.evaluateModel(classifier, data);
 
             //Display results
             System.out.println(evaluation.toSummaryString());
@@ -121,13 +121,13 @@ public class StarClassifier {
     }
 
     //Saves results of evaluated classifier
-    public void saveResults(Instances data, String resultSetName) {
+    public boolean saveResults(Instances data, String resultSetName) {
         System.out.println("Entering StarClassifier - saveResults");
 
         //Check classifier has been evaluated
         if (evaluation == null) {
             System.err.println("No evaluation has been made yet!");
-            return;
+            return false;
         }
 
         this.resultSet = new ResultSet();
@@ -178,6 +178,7 @@ public class StarClassifier {
         this.resultSet.setPredictions(predictions);
 
         System.out.println("Exiting StarClassifier - saveResults");
+        return true;
     }
 
 }//End StarClassifier

@@ -61,7 +61,7 @@ public class LcManager extends HttpServlet {
         bean = (JDBCBean) context.getAttribute("JDBCBean");
 
         //Get light curve directory paths
-        lcPath = request.getSession().getServletContext().getRealPath("/resources/lightcurves/");
+        lcPath = context.getRealPath("/resources/lightcurves/");
         relativeLcPath = (String) context.getInitParameter("RelativeLcPath");
 
         //Determine action requested
