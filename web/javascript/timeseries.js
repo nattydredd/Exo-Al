@@ -39,10 +39,9 @@ function renderTimeseries(dataFilePath, targetElement) {
         //Timeseries canvas
         var svg = targetElement.append("svg")
                 .classed("canvas", true)
-                .attr("id", "canvas")
+//                .attr("id", "canvas")
                 .attr("width", width)
-                .attr("height", height)
-                .call(zoom);
+                .attr("height", height);
 
         //Create and append axis
         var xAxis = d3.axisBottom(x)
@@ -62,6 +61,14 @@ function renderTimeseries(dataFilePath, targetElement) {
         var gY = svg.append("g")
                 .attr("class", "axis yAxis")
                 .call(yAxis);
+
+        //Rectangle to hold svg for panning and zooming
+        var view = svg.append("rect")
+                .attr("class", "view")
+                .attr("x", 0.5)
+                .attr("y", 0.5)
+                .attr("width", width - 1)
+                .attr("height", height - 1);
 
         //Axis labels
         svg.append("text")
@@ -92,10 +99,12 @@ function renderTimeseries(dataFilePath, targetElement) {
                 .attr("cy", function (d) {
                     return y(d.lum);
                 });
-
+                
+        svg.call(zoom);
+        
         //Zoom function
         function zoomed() {
-            svg.attr("transform", d3.event.transform);
+            view.attr("transform", d3.event.transform);
             gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
             gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
             svg.selectAll(".dot").attr("transform", d3.event.transform);
