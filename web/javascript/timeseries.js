@@ -39,7 +39,7 @@ function renderTimeseries(dataFilePath, targetElement) {
         //Timeseries canvas
         var svg = targetElement.append("svg")
                 .classed("canvas", true)
-//                .attr("id", "canvas")
+                .attr("id", "canvas")
                 .attr("width", width)
                 .attr("height", height);
 

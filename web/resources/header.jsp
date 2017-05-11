@@ -1,6 +1,6 @@
 <nav class="navBar">
     <div class="navMenu">
-        <img class="nd-logo" src="${pageContext.request.contextPath}/resources/images/nd-logo.bmp">
+        <img class="nd-logo" src="${pageContext.request.contextPath}/resources/images/nd-logo.png">
         <ul class="menu">
             <li>
                 <a href="${pageContext.request.contextPath}/home"><span>Home</span></a>

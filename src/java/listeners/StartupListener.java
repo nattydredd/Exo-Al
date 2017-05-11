@@ -30,19 +30,19 @@ public class StartupListener implements ServletContextListener {
         context = event.getServletContext();
 
         //Get JDBC Parameters (local)
-        String driver = context.getInitParameter("JDBC-Driver");
-        String url = context.getInitParameter("JDBC-URL");
-        String userName = context.getInitParameter("JDBC-UserName");
-        String password = context.getInitParameter("JDBC-Password");
+//        String driver = context.getInitParameter("JDBC-Driver");
+//        String url = context.getInitParameter("JDBC-URL");
+//        String userName = context.getInitParameter("JDBC-UserName");
+//        String password = context.getInitParameter("JDBC-Password");
 
         //Get JDBC Parameters (AWS)
-//        String driver = context.getInitParameter("JDBC-Driver");
-//        String dbName = System.getProperty("RDS_DB_NAME");
-//        String userName = System.getProperty("RDS_USERNAME");
-//        String password = System.getProperty("RDS_PASSWORD");
-//        String hostname = System.getProperty("RDS_HOSTNAME");
-//        String port = System.getProperty("RDS_PORT");
-//        String url = "jdbc:mysql://" + hostname + ":" + port + "/" + dbName;
+        String driver = context.getInitParameter("JDBC-Driver");
+        String dbName = System.getProperty("RDS_DB_NAME");
+        String userName = System.getProperty("RDS_USERNAME");
+        String password = System.getProperty("RDS_PASSWORD");
+        String hostname = System.getProperty("RDS_HOSTNAME");
+        String port = System.getProperty("RDS_PORT");
+        String url = "jdbc:mysql://" + hostname + ":" + port + "/" + dbName;
         
         //Create JDBC bean
         bean = new JDBCBean(driver, url, userName, password);

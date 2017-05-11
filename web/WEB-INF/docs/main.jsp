@@ -10,7 +10,7 @@
     <head>
         <title>Nated</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/nd-logo.bmp" />
+        <link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/nd-logo.png" />
         <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/natedStyle.css">
         <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/jquery-ui.min.css">
         <script type="text/javascript" src="${pageContext.request.contextPath}/javascript/jquery/jquery-3.1.1.min.js" charset="utf-8"></script>
