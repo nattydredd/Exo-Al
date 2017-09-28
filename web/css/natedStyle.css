@@ -120,5 +120,5 @@ table {
 
 th {
     background-color: var(--navBarBackgroundColor);
-    color: var()--navBarMenuTextColor);
+    color: var(--navBarMenuTextColor);
 }

@@ -169,7 +169,7 @@ public class StarClassifier {
             predictedClass = Double.valueOf(predTokens[2]);
             nonHostDistribution = Double.valueOf(predTokens[4]);
             hostDistribution = Double.valueOf(predTokens[5]);
-            error = actualClass == predictedClass ? false : true;
+            error = !(actualClass == predictedClass);
 
             predictions.add(new PredictionSet(starID, actualClass, predictedClass, nonHostDistribution, hostDistribution, error));
         }

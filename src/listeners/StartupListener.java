@@ -19,7 +19,7 @@ import java.sql.SQLException;
  */
 public class StartupListener implements ServletContextListener {
 
-    //Servlet contect variable
+    //Servlet connect variable
     private ServletContext context;
     //JDBC connection bean
     private JDBCBean bean;
