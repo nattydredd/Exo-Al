@@ -17,7 +17,7 @@ Think of it as 'teaching' the AI to be better at its job.
 available from: https://exoplanetarchive.ipac.caltech.edu/index.html
 
 -A set of statistical features were for each stars light curve using a separate feature extraction module
-available from: https://github.com/NathanDuran/FeatureExtraction
+available from: https://github.com/NathanDuran/Feature-Extraction
 
 -Due to the size of the full light curve dataset a smaller dataset was created from
 20 light curves and has been included: Exo-AL/web/resources/datasets/ValidationSetTEST.arff
