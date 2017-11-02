@@ -11,9 +11,9 @@ whether you think it may, or may not, be host to an orbiting exoplanet. By askin
 help the AI to classify stars we hope to improve its ability to classify stars in the future.
 Think of it as 'teaching' the AI to be better at its job.
 
--You can find the project at: www.nated.co.uk
+Markup : * You can find the project at: www.nated.co.uk
 
--Datasets were created from the raw light curve data from the Kepler mission
+*Datasets were created from the raw light curve data from the Kepler mission
 available from: https://exoplanetarchive.ipac.caltech.edu/index.html
 
 -A set of statistical features were for each stars light curve using a separate feature extraction module
